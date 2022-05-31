@@ -1,11 +1,19 @@
 <?php
 
-namespace Artificers\Network\Http\Controller;
+namespace Artificers\Network\Routing\Controller;
 
 use Artificers\Foundation\Application;
 
 class Controller {
+    private static string $content;
+
     public static function view(): string {
-        return Application::$app->viewKernel->render();
+        try {
+            self::$content = Application::$app->viewKernel->render();
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+
+        return self::$content;
     }
 }

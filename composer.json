@@ -1,0 +1,31 @@
+{
+    "name": "mechanix/framework",
+    "description": "The mechanix framework",
+    "keywords": ["mechanix", "framework"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "toerso",
+            "email": "toerso.mechanix@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Artificers\\": "src/Artificers"
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "symfony/process": "6.1.x-dev",
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "replace": {
+        "artificers/view": "self.version",
+        "artificers/treaties": "self.version",
+        "artificers/filesystem": "self.version",
+        "artificers/test": "self.version",
+        "artificers/supports": "self.version"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -2,8 +2,8 @@
 
 namespace Artificers\Test;
 
-class Io {
-    public function formattingDump($param):void {
+class PrintTest {
+    public static function formattingDump($param):void {
         echo "<pre>";
         var_dump($param);
         echo "</pre>";

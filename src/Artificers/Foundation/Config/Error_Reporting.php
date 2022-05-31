@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Foundation\config;
+namespace Artificers\Foundation\Config;
 
 class Error_Reporting {
     private string $basePath;

@@ -1,5 +1,5 @@
 <?php
-namespace Artificers\Foundation\config;
+namespace Artificers\Foundation\Config;
 
 use Dotenv\Dotenv;
 
