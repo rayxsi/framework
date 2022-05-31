@@ -1,0 +1,18 @@
+{
+    "name": "artificers/treaties",
+    "description": "A package of artificers",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Artificers\\Treaties\\": ""
+        }
+    },
+    "authors": [
+        {
+            "name": "toerso",
+            "email": "toerso.mechanix@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
