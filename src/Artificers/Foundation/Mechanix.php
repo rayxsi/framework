@@ -1,6 +1,7 @@
 <?php
 namespace Artificers\Foundation;
 
+use Artificers\Container\Container;
 use Artificers\Filesystem\Filesystem;
 use Artificers\Foundation\Config\EnvConfig;
 use Artificers\Foundation\Config\Error_Reporting;
@@ -9,7 +10,7 @@ use Artificers\Network\Http\Request;
 use Artificers\Network\Http\Response;
 use Artificers\Network\Routing\Router;
 
-class Application {
+class App extends Container {
 
     //base path or root path
     public string $basePath;
@@ -23,7 +24,7 @@ class Application {
     protected Error_Reporting $errorReporting;
 
     public ViewKernel $viewKernel;
-    public static Application $app;
+    public static App $app;
     public Request $request;
     public Response $response;
 
@@ -50,11 +51,11 @@ class Application {
         $this->errorReporting->_set_reporting();
 
         //load routeService. THIS WILL HAVE TO CHANGE.................................................
-        include_once $this->basePath.self::_DS_.'routing'.self::_DS_."web.php";
-        include_once $this->basePath.self::_DS_.'routing'.self::_DS_."api.php";
+        include_once $this->basePath.self::_DS_.'routes'.self::_DS_."web.php";
+        include_once $this->basePath.self::_DS_.'routes'.self::_DS_."api.php";
     }
 
-    public function run($request): Application {
+    public function run($request): App {
        $request::capture();
         $this->getReadyUiEngine();
         return $this;
@@ -76,8 +77,12 @@ class Application {
         return $this->viewLayout;
     }
 
+    public function getBase(): string {
+        return $this->basePath;
+    }
+
     public function send(): void {
-       echo $this->router->resolve();
+       //echo $this->router->resolve();
     }
 
     private function registerInstances(): void {
@@ -93,7 +98,7 @@ class Application {
         $this->viewKernel->loadEngine(Request::$server);
     }
 
-    public static function getApplication(): Application {
+    public static function getApplication(): App {
         return self::$app;
     }
 }
