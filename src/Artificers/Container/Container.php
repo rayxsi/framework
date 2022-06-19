@@ -2,17 +2,21 @@
 declare(strict_types=1);
 namespace Artificers\Container;
 
+use ArrayAccess;
+use Artificers\Supports\Reflector;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\ContainerTreaties;
 use Artificers\Treaties\Container\NotFoundException;
 use Closure;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\TentativeType;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
 use ReflectionParameter;
 use TypeError;
 
-class Container implements ContainerTreaties {
+class Container implements ArrayAccess, ContainerTreaties {
     /**
      *All explicitly bindings goes to bindings array.
      *
@@ -321,7 +325,7 @@ class Container implements ContainerTreaties {
         foreach($dependencies as $dependency) {
             //In here first we assume that dependency is a ReflectionNamedType, and it has proper type hinted then get the class name of this dependency.
             //Now if the getParamClassName return null then it is primitive type we have to handle resolveUnionType, Otherwise we get proper class name and have to handle resolveClass.
-            $arr = is_null($this->getParamClassName($dependency)) ? $this->resolveUnionType($dependency) : $this->resolveClass($dependency);
+            $arr = is_null(Reflector::getParamClassName($dependency)) ? $this->resolveUnionType($dependency) : $this->resolveClass($dependency);
 
             $instancesArr[] = $arr;
         }
@@ -355,7 +359,7 @@ class Container implements ContainerTreaties {
     private function resolveClass(ReflectionParameter $param): mixed {
         //1.Check  if it is variadic(class) type hint
         try {
-           return $param->isVariadic() ? $this->resolveVariadicClass($param) : $this->make($this->getParamClassName($param));
+           return $param->isVariadic() ? $this->resolveVariadicClass($param) : $this->make(Reflector::getParamClassName($param));
         }catch (BindingException $e) {
             if($param->isDefaultValueAvailable()) {
                 return $param->getDefaultValue();
@@ -375,7 +379,7 @@ class Container implements ContainerTreaties {
      */
     private function resolveVariadicClass(ReflectionParameter $param): mixed {
         //Resolve parameter type and alias
-        $className = $this->getParamClassName($param);
+        $className = Reflector::getParamClassName($param);
         $interfaceIdentifier = $this->getAlias($className);
 
         //Resolve declaring class name and alias
@@ -402,30 +406,6 @@ class Container implements ContainerTreaties {
     }
 
     /**
-     *Return class name of a given parameter.
-     *
-     * @param ReflectionParameter $param
-     * @return string|null
-     */
-    private function getParamClassName(ReflectionParameter $param): string|null {
-        //check parameter type is built in or not. If it is then return null. Because it is primitive type, and we have to handle it separately.
-        $type = $param->getType();
-
-        if(!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-            return null;
-        }
-
-        $name = $type->getName();
-        //check type name. If it is self type or parent type hinted
-        if(!is_null($class = $param->getDeclaringClass())) {
-            if($name === "self") return $class->getName();
-            if($name === "parent" && $parent = $class->getParentClass()) return $parent->getName();
-        }
-
-        return $name;
-    }
-
-    /**
      * Throws an exception if not instantiable.
      *
      * @param $concrete
@@ -438,8 +418,12 @@ class Container implements ContainerTreaties {
     /**
      *Bind variadic parameters.
      *
+     * Where declared.
      * @param string $when
+     *
+     * Interface name.
      * @param string $identifier
+     *
      * @param Closure|array $concrete
      * Callback must have to return an array.
      *
@@ -460,5 +444,56 @@ class Container implements ContainerTreaties {
      */
     public function singleton(string $identifier, Closure|string $concrete = null, bool $shared = false): void {
         $this->bind($identifier, $concrete, true);
+    }
+
+    /**
+     * Register an existing instance as shared in the container.
+     *
+     * @param  string  $identifier
+     * @param  mixed  $instance
+     * @return mixed
+     */
+    public function setInstance(string $identifier, mixed $instance): mixed {
+        $this->instances[$identifier] = $instance;
+
+        return $instance;
+    }
+
+    public function __get(string $key) {
+       return $this[$key];
+    }
+
+    /**
+    * @inheritDoc
+     */
+    public function offsetExists(mixed $offset): bool {
+        return $this->bound($offset);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws NotFoundException
+     * @throws BindingException
+     */
+    public function offsetGet(mixed $offset): mixed {
+        return $this->make($offset);
+    }
+
+    /**
+    * @inheritDoc
+     */
+    public function offsetSet(mixed $offset, mixed $value): void {
+        $this->bind($offset, $value instanceof Closure ? $value : fn() => $value);
+    }
+
+    /**
+    * @inheritDoc
+     */
+    public function offsetUnset(mixed $offset): void {
+        unset($this->bindings[$offset], $this->resolved[$offset], $this->instances[$offset]);
+    }
+
+    public function __set(string $key, $value): void {
+        $this[$key] = $value;
     }
 }

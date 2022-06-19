@@ -2,7 +2,8 @@
 
 namespace Artificers\Foundation\Exception;
 
-class ApplicationFailedException
-{
+use Exception;
+
+class ApplicationFailedException extends Exception {
 
 }

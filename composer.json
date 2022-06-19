@@ -1,7 +1,7 @@
 {
-    "name": "mechanix/framework",
-    "description": "The mechanix framework",
-    "keywords": ["mechanix", "framework"],
+    "name": "rayxsi/framework",
+    "description": "The rayxsi framework",
+    "keywords": ["rayxsi", "framework"],
     "license": "MIT",
     "authors": [
         {
@@ -15,11 +15,15 @@
         }
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.0",
         "symfony/process": "6.1.x-dev",
-        "vlucas/phpdotenv": "^5.4"
+        "vlucas/phpdotenv": "^5.4",
+        "psr/container": "^2.0",
+        "psr/event-dispatcher": "^1.0",
+        "symfony/http-foundation": "^6.1"
     },
     "replace": {
+        "artificers/routing": "self.version",
         "artificers/view": "self.version",
         "artificers/treaties": "self.version",
         "artificers/filesystem": "self.version",

@@ -2,7 +2,5 @@
 
 namespace Artificers\Network\Routing;
 
-class Route
-{
-
+class AbstractRouteCollection {
 }

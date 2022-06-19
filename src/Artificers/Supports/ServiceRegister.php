@@ -1,0 +1,24 @@
+<?php
+
+namespace Artificers\Supports;
+
+use Artificers\Foundation\Rayxsi;
+
+abstract class ServiceRegister {
+    protected Rayxsi $rXsiApp;
+
+    public function __construct($rXsiApp) {
+        $this->rXsiApp = $rXsiApp;
+    }
+
+    /**
+    *Register services with Mechanix.
+     *
+     * This method could be overwritten.
+     *
+     * @return void
+     */
+    public function register(): void{
+        //Register code goes here
+    }
+}

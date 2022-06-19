@@ -2,7 +2,6 @@
 
 namespace Artificers\Database\PDO;
 
-class Mysql
-{
+class Mysql {
 
 }

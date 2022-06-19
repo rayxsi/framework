@@ -2,24 +2,19 @@
 
 namespace Artificers\Foundation\View;
 
-use Artificers\Foundation\Application;
+use Artificers\Foundation\Rayxsi;
 use Artificers\View\Engines\Croxo;
 use Artificers\View\Renderer;
 
 class Kernel {
-    private Application $app;
     private Renderer $renderer;
 
     private object $ui;
     private string $script;
 
-    public function __construct(Application $app) {
-        $this->app = $app;
-    }
-
     public function render(): string {
-        $viewWithJson = $this->renderer->render($this->app->getSsrFile());
-        $layoutMarkup = file_get_contents($this->app->getViewLayout());
+        $viewWithJson = $this->renderer->render(SSR_FILE);
+        $layoutMarkup = file_get_contents(VIEW_LAYOUT_REACT);
         $this->ui = json_decode($viewWithJson);
         $layoutMarkupWithState = $this->handleUiState($layoutMarkup);
 
@@ -45,7 +40,7 @@ class Kernel {
     }
 
     public function loadEngine(array $server): void {
-        $croxoEngine = new Croxo($this->app->getNodejs(), $this->app->getTmpDir());
+        $croxoEngine = new Croxo(NODE_PATH, LOG_DIR);
         $this->renderer = new Renderer($croxoEngine, $server);
     }
 }

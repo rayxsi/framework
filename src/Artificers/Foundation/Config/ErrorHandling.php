@@ -18,7 +18,7 @@ class ErrorHandling {
 
     public static function errorHandling($errno, $message, $filename, $lineno): void {
 
-        throw new ErrorException($message, 0, $filename, $lineno);
+        throw new ErrorException($message, 0, 1, $filename, $lineno);
     }
 
     /**
