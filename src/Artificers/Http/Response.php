@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Network\Http;
+namespace Artificers\Http;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class Response extends SymfonyResponse{

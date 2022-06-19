@@ -3,9 +3,9 @@
 namespace Artificers\Foundation\Http;
 
 use Artificers\Foundation\Rayxsi;
-use Artificers\Network\Http\Request;
-use Artificers\Network\Http\Response;
-use Artificers\Network\Routing\Router;
+use Artificers\Http\Request;
+use Artificers\Http\Response;
+use Artificers\Routing\Router;
 use Artificers\Treaties\Http\HttpKernelTreaties;
 
 class Kernel implements HttpKernelTreaties {

@@ -1,5 +1,5 @@
 <?php
-namespace Artificers\Network\Http;
+namespace Artificers\Http;
 
 use Artificers\Supports\Concern\Regex;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;

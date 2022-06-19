@@ -1,8 +1,8 @@
 <?php
 
-namespace Artificers\Network\Routing;
+namespace Artificers\Routing;
 
-use Artificers\Network\Http\Request;
+use Artificers\Http\Request;
 
 class RouteCollection {
     /**

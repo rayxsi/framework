@@ -1,10 +1,10 @@
 <?php
 
-namespace Artificers\Network\Routing\Events;
+namespace Artificers\Routing\Events;
 
 use Artificers\Events\Event;
-use Artificers\Network\Http\Request;
-use Artificers\Network\Routing\Route;
+use Artificers\Http\Request;
+use Artificers\Routing\Route;
 
 class RouteMatchedEvent extends Event {
     public const type = 'route.matched';

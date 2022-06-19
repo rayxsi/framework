@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Network\Routing;
+namespace Artificers\Routing;
 
 use Artificers\Container\Container;
 use Artificers\Supports\ServiceRegister;

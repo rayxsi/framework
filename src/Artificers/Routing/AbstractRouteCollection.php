@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Network\Routing;
+namespace Artificers\Routing;
 
 class AbstractRouteCollection {
 }

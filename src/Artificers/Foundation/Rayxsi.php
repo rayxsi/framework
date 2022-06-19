@@ -9,9 +9,10 @@ use Artificers\Foundation\Config\Config;
 use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\Env;
 use Artificers\Foundation\Environment\EnvServiceRegister;
+use Artificers\Routing\RouteServiceRegister;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
-use Artificers\Routing\RouteServiceRegister;
+
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -120,9 +121,9 @@ class Rayxsi extends Container {
             'event.listener' => [\Artificers\Events\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
             'view' => [\Artificers\Foundation\View\Kernel::class],
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\Engine::class],
-            'router' => [\Artificers\Network\Routing\Router::class],
-            'request' => [\Artificers\Network\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
-            'response' => [\Artificers\Network\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
+            'router' => [\Artificers\Routing\Router::class],
+            'request' => [\Artificers\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
+            'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
         ];
 
         foreach($mechanix as $key=>$aliases) {

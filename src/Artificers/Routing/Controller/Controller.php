@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Network\Routing\Controller;
+namespace Artificers\Routing\Controller;
 
 use Artificers\Foundation\Rayxsi;
 

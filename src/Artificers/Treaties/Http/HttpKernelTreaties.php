@@ -1,7 +1,7 @@
 <?php
 
 namespace Artificers\Treaties\Http;
-use Artificers\Network\Http\Request;
+use Artificers\Http\Request;
 
 interface HttpKernelTreaties {
     public function resolve(Request $request);

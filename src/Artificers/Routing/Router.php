@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Artificers\Network\Routing;
+namespace Artificers\Routing;
 
 use ArrayIterator;
 use Artificers\Container\Container;
-use Artificers\Network\Http\Request;
-use Artificers\Network\Routing\Events\RouteMatchedEvent;
-use Artificers\Network\Routing\Exception\RouteNotFoundException;
+use Artificers\Http\Request;
+use Artificers\Routing\Events\RouteMatchedEvent;
+use Artificers\Routing\Exception\RouteNotFoundException;
 use Artificers\Treaties\Events\EventDispatcherTreaties;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Utilities\Ary;

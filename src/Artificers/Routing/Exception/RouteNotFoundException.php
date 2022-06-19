@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Network\Routing\Exception;
+namespace Artificers\Routing\Exception;
 
 use Exception;
 
