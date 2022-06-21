@@ -1,2 +1,4 @@
 # framework
-The rayxsi framework
+The rayxsi framework.
+
+On going project.
