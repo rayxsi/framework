@@ -21,8 +21,9 @@ class Kernel implements HttpKernelTreaties {
     public function resolve(Request $request): Response {
         //set the current request to the container so that we can use it until the response back.
         $this->rXsiApp->setInstance('request', $request);
-        //register view
-        $this->rXsiApp->register(new ViewServiceRegister($this->rXsiApp));
+
+        //here we need to explicitly bind the server info to the front end.
+        $this->rXsiApp['view']->compiler->bindServer($this->rXsiApp['request']->getSerializedServerInfo());
 
         return $this->router->resolveWithRouter($request);
     }

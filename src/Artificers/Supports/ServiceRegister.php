@@ -7,7 +7,7 @@ use Artificers\Foundation\Rayxsi;
 abstract class ServiceRegister {
     protected Rayxsi $rXsiApp;
 
-    public function __construct($rXsiApp) {
+    public function __construct(Rayxsi $rXsiApp) {
         $this->rXsiApp = $rXsiApp;
     }
 

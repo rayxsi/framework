@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Foundation\Supports\Register;
+namespace Artificers\Foundation\Supports\Registers;
 
 use Artificers\Supports\ServiceRegister;
 use Closure;

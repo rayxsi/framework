@@ -14,12 +14,13 @@ use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\Env;
 use Artificers\Foundation\Environment\EnvServiceRegister;
 use Artificers\Foundation\Events\BootEvent;
-use Artificers\Foundation\Events\BootListener;
 use Artificers\Routing\RouteServiceRegister;
 use Artificers\Supports\Illusion\Illusion;
+use Artificers\Supports\ServiceRegister;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
 
+use Artificers\Utilities\Ary;
 use Artificers\View\ViewServiceRegister;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -36,7 +37,9 @@ class Rayxsi extends Container {
 
     protected bool $boot = false;
 
+    protected array $serviceRegister = [];
 
+    protected array $registeredServices = [];
 
     public function __construct($basePath) {
         defined('DS') or define('DS', '/');
@@ -198,8 +201,22 @@ class Rayxsi extends Container {
         ]);
     }
 
+    /**
+     * @throws NotFoundException
+     * @throws BindingException
+     */
     public function registerConfiguredServices(): void {
-        $this->make('config')->get();
+        //resolve all registers from repository
+       $registers = $this['config']->get('rXsiApp.registers');
+
+       //make instance of all service register
+       foreach($registers as $idx => $register) {
+           $this->register($register);
+
+           unset($registers[$idx]);
+       }
+
+
     }
 
     /**
@@ -250,24 +267,79 @@ class Rayxsi extends Container {
         $this->register(new EnvServiceRegister($this));
         $this->register(new EventServiceRegister($this));
         $this->register(new RouteServiceRegister($this));
-
-        //just for test purpose. We change it later.
-        $this->register(new CacheServiceRegister($this));
     }
 
     /**
      * Call register method of service register.
      *
-     * @param object $identifier
-     * @return void
+     * @param object|string $identifier
+     * @param bool $force
+     * @return ?ServiceRegister
      */
-    public function register(object $identifier): void {
+    public function register(object|string $identifier, bool $force=false): ?ServiceRegister {
+        //1. we have to check if service register already applied. If it is then just return it.
+
+        if(($registered = $this->getServiceRegister($identifier)) && !$force) {
+            return $registered;
+        }
+
+        //2. if service register passed by string then we have to resolve it.
+
+        if(is_string($identifier)) {
+            $identifier = $this->resolveServiceRegister($identifier);
+        }
+
+        //3. now call the register method of service registers to register with rayxsi.
         $identifier->register();
+
+        //4. call the boot method also
+        if($this->isBooted()) {
+            $identifier->boot();
+        }
+
+        //5. at last set mark to this service register that is applied.
+        $this->markAsRegistered($identifier);
+
+        return $identifier;
+    }
+
+    /**
+     * @param object|string $register
+     * @return mixed
+     */
+    protected function getServiceRegister(object|string $register): mixed {
+        $id = is_string($register) ? $register : get_class($register);
+
+        $registers = Ary::filter($this->serviceRegister, function($value) use($id){
+            return $value instanceof $id;
+        }, 'both');
+
+        return array_values($registers)[0] ?? null;
+    }
+
+    /**
+     * @param string $register
+     * @return ServiceRegister
+     */
+    protected function resolveServiceRegister(string $register): ServiceRegister {
+        return $this[$register];
+    }
+
+    protected function markAsRegistered(object $name) {
+        $this->serviceRegister[] = $name;
+        $this->registeredServices[get_class($name)] = true;
     }
 
     public function booted($callback) {
         if($this->boot) {
             $callback($this);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBooted(): bool {
+        return $this->boot;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Artificers\Config;
 
+use Artificers\Utilities\Ary;
+
 class Repository {
 
     /**
@@ -13,20 +15,25 @@ class Repository {
     /**
      * Set configuration into repository.
      *
-     * @param string $key
+     * @param string|array $key
      * @param string|array|null $value
      * @return void
      */
-    public function set(string $key, string|array|null $value = null): void {
+    public function set(string|array $key, string|array|null $value = null): void {
+        $keys = is_array($key) ? $key : [$key => $value];
 
-        $this->items[$key] = $value;
+        foreach($keys as $key => $value) {
+            Ary::set($this->items, $key, $value);
+        }
     }
 
-    protected function collectKeys(string $key): array {
-       return str_contains($key, '.') ? explode('.', $key) : [$key];
-    }
-
-    public function get() {
-
+    /**
+     * Get the item from repository.
+     *
+     * @param $key
+     * @return mixed
+     */
+    public function get($key): mixed {
+        return Ary::get($this->items, $key);
     }
 }
