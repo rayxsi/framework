@@ -14,7 +14,4 @@
     }
   ],
   "minimum-stability": "dev",
-  "require": {
-    "../../../../../testrayxsi/vendor/symfony/process": "6.1.x-dev"
-  }
 }

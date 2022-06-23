@@ -21,4 +21,6 @@ abstract class ServiceRegister {
     public function register(): void{
         //Register code goes here
     }
+
+    public function boot(): void {}
 }

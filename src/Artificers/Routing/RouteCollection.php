@@ -3,6 +3,7 @@
 namespace Artificers\Routing;
 
 use Artificers\Http\Request;
+use Closure;
 
 class RouteCollection {
     /**
@@ -24,10 +25,18 @@ class RouteCollection {
     public function add(Route $route): Route {
         $this->routes[$route->getMethod()][$route->getUri()] = $route;
         $this->allRoutes[$route->getUri()] = $route;
-        $this->routeActionList[$route->getAction()] = $route;
+        $this->addToRouteActionList($route);
         $this->addToLookUp($route);
 
         return $route;
+    }
+
+    private function addToRouteActionList(Route $route): void {
+        $action = $route->getAction();
+
+        if(!$action instanceof Closure) {
+            $this->routeActionList[$action] = $route;
+        }
     }
 
     private function addToLookUp(Route $route): void {
@@ -36,7 +45,7 @@ class RouteCollection {
         }
     }
 
-    private function refreshNameList(): void {
+    public function refreshNameList(): void {
         foreach($this->allRoutes as $route) {
             $this->addToLookUp($route);
         }
@@ -66,14 +75,28 @@ class RouteCollection {
      * @param Request $request
      * @return Route|null
      */
-    public function findRouteFromCollection(Request $request): ?Route {
+    public function match(Request $request): ?Route {
         $this->refreshNameList();
 
         //1. We have to resolve request uri and method.
         $requestUri = urldecode($request->getRequestUri());
         $requestMethod = $request->getMethod();
 
-        return $this->getMatchedRoute($requestMethod, $requestUri);
+        $route = $this->getMatchedRoute($requestMethod, $requestUri);
+
+        return $this->handleMatchedRoute($request, $route);
+    }
+
+
+    private function handleMatchedRoute(Request $request, Route|null $route): ?Route {
+        if(is_null($route)) {
+            //then we have to find the fallback route.
+           $fallbackRoute = $this->allRoutes['[fallback]'];
+
+          return $fallbackRoute->setUri($fallbackRoute->where['fallback']);
+        }
+
+        return $route;
     }
 
     private function getMatchedRoute(string $method, string $targetUri): Route|null {

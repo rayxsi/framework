@@ -76,7 +76,7 @@ class EventDispatcher implements EventDispatcherTreaties {
      * @throws ReflectionException
      */
     private function resolveWithIdentifier(string $listener,object $event) {
-        [$controller, $method] = explode('@', $listener);
+        [$controller, $method] = str_contains($listener, '@') ? explode('@', $listener) : [$listener, 'handle']; //default is handle method.
         $resolvedDependencies = $this->resolveDependenciesOfActionMethod($controller, $method, $event);
 
         try {
@@ -88,7 +88,7 @@ class EventDispatcher implements EventDispatcherTreaties {
         }
 
         try {
-            call_user_func([$object, $method ?? 'handle'], ...$resolvedDependencies);
+            call_user_func([$object, $method], ...$resolvedDependencies);
         }catch(NotValidMethodException $e) {
             throw new NotValidMethodException("Class {get_class($object)} does not have a method [$method]", $e->getCode());
         }

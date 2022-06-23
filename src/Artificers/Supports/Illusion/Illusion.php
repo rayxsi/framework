@@ -8,7 +8,7 @@ use http\Exception\RuntimeException;
 abstract class Illusion {
     protected static Rayxsi $rXsiApp;
 
-    protected static array $resolvedInstances = [];
+    protected static array $cachedInstances = [];
 
     protected static bool $cache = true;
 
@@ -39,13 +39,13 @@ abstract class Illusion {
      * @return mixed|void
      */
     protected static function resolvedIllusionInstance(string $name) {
-        if(isset(static::$resolvedInstances[$name])) {
-            return static::$resolvedInstances[$name];
+        if(isset(static::$cachedInstances[$name])) {
+            return static::$cachedInstances[$name];
         }
 
         if(static::$rXsiApp) {
             if(static::$cache) {
-               return static::$resolvedInstances[$name] = static::$rXsiApp[$name];
+               return static::$cachedInstances[$name] = static::$rXsiApp[$name];
             }
 
             return static::$rXsiApp[$name];
@@ -55,7 +55,7 @@ abstract class Illusion {
     /**
      * Set the Mechanix application.
      *
-     * @param Mechanix $app
+     * @param Rayxsi $app
      * @return void
      */
     public static function setIllusionApplication(Rayxsi $app): void {
@@ -69,7 +69,7 @@ abstract class Illusion {
      * @return void
      */
     public static function removeCachedInstance(string $name): void {
-        unset(static::$resolvedInstances[$name]);
+        unset(static::$cachedInstances[$name]);
     }
 
     /**
@@ -78,7 +78,7 @@ abstract class Illusion {
      * @return void
      */
     public static function removeAllCachedInstances(): void {
-        static::$resolvedInstances = [];
+        static::$cachedInstances = [];
     }
 
     public static function __callStatic(string $method, array $args) {

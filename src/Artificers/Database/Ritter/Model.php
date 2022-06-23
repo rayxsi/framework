@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Database;
+namespace Artificers\Database\Ritter;
 
 use Artificers\Database\Concern\InteractWithInputValidation;
 

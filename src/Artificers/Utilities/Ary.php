@@ -18,7 +18,24 @@ class Ary {
         return false;
     }
 
+    /**
+     * Check is array or not.
+     *
+     * @param $array
+     * @return bool
+     */
     public static function isArr($array): bool {
         return is_array($array);
+    }
+
+    /**
+     * Change array key case.
+     *
+     * @param array $array
+     * @param $case
+     * @return array
+     */
+    public  static function changeKeyCase(array $array, $case): array {
+        return array_change_key_case($array, $case);
     }
 }

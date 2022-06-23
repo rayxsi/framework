@@ -6,8 +6,10 @@ namespace Artificers\Routing;
 use ArrayIterator;
 use Artificers\Container\Container;
 use Artificers\Http\Request;
+use Artificers\Http\Response;
 use Artificers\Routing\Events\RouteMatchedEvent;
 use Artificers\Routing\Exception\RouteNotFoundException;
+use Artificers\Supports\Illusion\View;
 use Artificers\Treaties\Events\EventDispatcherTreaties;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Utilities\Ary;
@@ -26,6 +28,9 @@ class Router {
 
         $this->listener = $this->container['event.listener'];
         $this->dispatcher = $this->container['event.dispatcher'];
+
+        //add fallback router by default.
+        $this->fallback(function() {View::generate();});
     }
 
     /**
@@ -64,6 +69,12 @@ class Router {
        return $this->addRoute('DELETE', $uri, $action);
     }
 
+    public function fallback(callable $action): Route {
+        $placeholder = "fallback";
+
+        return $this->addRoute('GET', "[{$placeholder}]", $action)->where($placeholder, '.*')->name('fallback');
+    }
+
     protected function addRoute(string $method, string $uri, callable|string|array $action): Route {
         return $this->routes->add($this->createRoute($method, $uri, $action));
     }
@@ -79,7 +90,7 @@ class Router {
             $action = $this->concatActionWithHandler($action);
         }
 
-        return new Route($method, $this->stripSlash($uri), $action);
+        return (new Route($method, $this->stripSlash($uri), $action))->setRouter($this)->setContainer($this->container);
     }
 
     /**
@@ -100,17 +111,97 @@ class Router {
     }
 
     /**
-     * @throws RouteNotFoundException
+     * @param Request $request
+     * @return Response
      */
-    public function resolveWithRouter(Request $request) {
-
-        $route = $this->routes->findRouteFromCollection($request);
-
-        if(!$route) {
-            throw  new RouteNotFoundException("Route not found.");
+    public function resolveWithRouter(Request $request): Response {
+        if(!$this->container->isResolved('view')) {
+            $this->initializeView();
         }
 
-        $this->container['event.listener']->addEventListener('route.matched', $route->properties['controller'], $route->properties['args']);
+        return $this->dispatchRoute($request);
+    }
+
+    /**
+     * prepare view engine.
+     *
+     * @return void
+     */
+    private function initializeView(): void {
+        $this->container['view'];
+    }
+
+    /**
+     * Dispatch the Route.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    private function dispatchRoute(Request $request): Response {
+        return $this->runRoute($request, $this->findRoute($request));
+    }
+
+    /**
+     * Run the matched Route.
+     *
+     * @param $request
+     * @param Route $route
+     * @return Response
+     */
+    private function runRoute($request, Route $route): Response {
+        $this->matched($route);
+
         $this->container['event.dispatcher']->dispatch(new RouteMatchedEvent($request, $route));
+
+        $view = $this->container['cache']->get('view');
+
+        $content = "";
+
+        if($view) {
+            $content = $view->get();
+            //clean view
+            $view->clean();
+        }
+
+        if($this->isFallback($route)) {
+            return response($content, 404,  ["Content-Type" => "text/html"]);
+        }
+
+        return response($content, 200,  ["Content-Type" => "text/html"]);
+    }
+
+    /**
+     * Set matched event.
+     *
+     * @param $route
+     * @return void
+     */
+    protected function matched($route): void {
+        $this->container['event.listener']->addEventListener('route.matched', $route->properties['controller'], $route->properties['args']);
+    }
+
+    /**
+     * Find the Route from RouteCollection.
+     *
+     * @param Request $request
+     * @return Route|null
+     */
+    private function findRoute(Request $request): ?Route {
+
+        return $this->routes->match($request);
+    }
+
+    /**
+     * Check if route is fallback route.
+     *
+     * @param Route $route
+     * @return bool
+     */
+    private function isFallback(Route $route): bool {
+        return $route->getUri() === '.*';
+    }
+
+    public function getRoutes(): RouteCollection {
+        return $this->routes;
     }
 }

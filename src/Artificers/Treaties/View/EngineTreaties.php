@@ -1,7 +1,7 @@
 <?php
     namespace Artificers\Treaties\View;
 
-    interface Engine {
+    interface EngineTreaties {
         public function run(string $script): string;
         public function getDispatchHandler(): string;
     }

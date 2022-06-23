@@ -2,6 +2,7 @@
 
 namespace Artificers\Routing;
 
+use Artificers\Container\Container;
 use Closure;
 
 class Route {
@@ -22,6 +23,12 @@ class Route {
      *
      */
     private string $method;
+
+    public Router $router;
+
+    public Container $container;
+
+    public array $where = [];
 
     public function __construct(string $method, string $uri, Closure|string $action) {
         $this->method = $method;
@@ -72,6 +79,11 @@ class Route {
         return $this->uri;
     }
 
+    public function setUri(string $exp): self {
+        $this->uri = $exp;
+        return $this;
+    }
+
     /**
      *Get the route action.
      *
@@ -111,6 +123,42 @@ class Route {
      */
     public function getUriParams(): array {
         return $this->properties['args'];
+    }
+
+    public function where(string|array $placeholder, string $exp = null): self {
+        foreach($this->parseWhereClause($placeholder, $exp) as $name=>$expression) {
+            $this->where[$name] = $expression;
+        }
+
+        return $this;
+    }
+
+    protected function parseWhereClause(string|array $placeholder, string $exp):  array {
+        return is_array($placeholder) ? $placeholder : [$placeholder=>$exp];
+    }
+
+    /**
+     * Set Router to route.
+     *
+     * @param Router $router
+     * @return $this
+     */
+    public function setRouter(Router $router): static {
+        $this->router = $router;
+
+        return $this;
+    }
+
+    /**
+     * Set container to route.
+     *
+     * @param Container $container
+     * @return $this
+     */
+    public function setContainer(Container $container): static {
+        $this->container = $container;
+
+        return $this;
     }
 
     /**

@@ -10,6 +10,9 @@
         }
     ],
     "autoload": {
+        "files": [
+            "src/Artificers/Supports/helpers.php"
+        ],
         "psr-4": {
             "Artificers\\": "src/Artificers"
         }
@@ -20,7 +23,8 @@
         "vlucas/phpdotenv": "^5.4",
         "psr/container": "^2.0",
         "psr/event-dispatcher": "^1.0",
-        "symfony/http-foundation": "^6.1"
+        "symfony/http-foundation": "^6.1",
+        "symfony/finder": "^6.1"
     },
     "replace": {
         "artificers/routing": "self.version",

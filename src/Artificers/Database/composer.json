@@ -1,10 +1,10 @@
 {
-  "name": "artificers/events",
+  "name": "artificers/database",
   "description": "A package of Artificers",
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Artificers\\Events\\": ""
+      "Artificers\\Database\\": ""
     }
   },
   "authors": [

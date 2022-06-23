@@ -10,4 +10,15 @@ class Request extends SymfonyRequest{
    public static function snap(): Request {
        return parent::createFromGlobals();
    }
+
+   public function getSerializedServerInfo(): array {
+        $server = [];
+
+        $server["SERVER_PORT"] = $this->getPort();
+        $server["REQUEST_URI"] = urldecode($this->getRequestUri());
+        $server["REQUEST_METHOD"] = $this->getMethod();
+        $server["HTTP_HOST"] = $this->getHttpHost();
+
+        return $server;
+   }
 }

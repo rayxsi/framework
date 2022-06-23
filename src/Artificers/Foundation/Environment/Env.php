@@ -12,4 +12,12 @@ class Env {
     public function load():void {
         Dotenv::createImmutable($this->basePath)->load();
     }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function collect(string $key): mixed {
+        return empty($_ENV[$key]) ? null : $_ENV[$key];
+    }
 }
