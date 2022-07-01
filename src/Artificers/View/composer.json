@@ -1,0 +1,20 @@
+{
+    "name": "artificers/view",
+    "description": "A package of Artificers",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Artificers\\View\\": ""
+        }
+    },
+    "authors": [
+        {
+            "name": "toerso",
+            "email": "toerso.mechanix@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "symfony/process": "6.1.x-dev"
+    }
+}
