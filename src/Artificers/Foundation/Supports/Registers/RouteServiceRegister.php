@@ -21,7 +21,8 @@ class RouteServiceRegister extends ServiceRegister {
     }
 
     protected function loadRoutes(): void {
-
+        //we need to change it to resolve call back dependencies.
+        call_user_func($this->loadRoutesUsingCallback);
     }
 
     /**
@@ -30,7 +31,7 @@ class RouteServiceRegister extends ServiceRegister {
      * @param  Closure  $routesCallback
      * @return $this
      */
-    protected function routes(Closure $routesCallback): self {
+    protected function registerRoutes(Closure $routesCallback): self {
         $this->loadRoutesUsingCallback = $routesCallback;
 
         return $this;

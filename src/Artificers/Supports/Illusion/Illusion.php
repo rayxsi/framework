@@ -3,7 +3,8 @@
 namespace Artificers\Supports\Illusion;
 
 use Artificers\Foundation\Rayxsi;
-use http\Exception\RuntimeException;
+use RuntimeException;
+
 
 abstract class Illusion {
     protected static Rayxsi $rXsiApp;

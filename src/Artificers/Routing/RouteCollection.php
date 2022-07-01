@@ -61,7 +61,7 @@ class RouteCollection {
     }
 
     public function getRoutes(string $method): array {
-        return $this->routes[$method];
+        return $this->routes[$method] ?? [];
     }
 
     public function prefixSlash(string $uri): string {
@@ -76,11 +76,13 @@ class RouteCollection {
      * @return Route|null
      */
     public function match(Request $request): ?Route {
-        $this->refreshNameList();
-
         //1. We have to resolve request uri and method.
         $requestUri = urldecode($request->getRequestUri());
         $requestMethod = $request->getMethod();
+
+//        var_dump($requestUri, $requestMethod);
+//
+//        die();
 
         $route = $this->getMatchedRoute($requestMethod, $requestUri);
 
@@ -89,14 +91,19 @@ class RouteCollection {
 
 
     private function handleMatchedRoute(Request $request, Route|null $route): ?Route {
-        if(is_null($route)) {
-            //then we have to find the fallback route.
-           $fallbackRoute = $this->allRoutes['[fallback]'];
+        if(!is_null($route)) {
 
-          return $fallbackRoute->setUri($fallbackRoute->where['fallback']);
+            return $route;
         }
 
-        return $route;
+        //then we have to find the fallback route.
+        $fallbackRoute = $this->allRoutes['[fallback]'] ?? null;
+
+        if(!$fallbackRoute) {
+            return null;
+        }
+
+        return $fallbackRoute->setUri($fallbackRoute->where['fallback']);
     }
 
     private function getMatchedRoute(string $method, string $targetUri): Route|null {
@@ -111,10 +118,10 @@ class RouteCollection {
                 if(preg_match_all($pattern, $targetUri, $matches)) {
                     $idx = 0;
                     for($i = 1; $i < count($matches); ++$i) {
-                        $key = $route->properties['args'][$idx];
-                        $route->properties['args'][$key] = $matches[$i][0];
+                        $key = $route->getProperties()['args'][$idx];
+                        $route->setArgs($key, $matches[$i][0]);
 
-                        unset($route->properties['args'][$idx++]);
+                        $route->unsetArgs($idx++);
                     }
 
                     return $route;

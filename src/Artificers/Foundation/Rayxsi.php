@@ -14,6 +14,7 @@ use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\Env;
 use Artificers\Foundation\Environment\EnvServiceRegister;
 use Artificers\Foundation\Events\BootEvent;
+use Artificers\Http\Request;
 use Artificers\Routing\RouteServiceRegister;
 use Artificers\Supports\Illusion\Illusion;
 use Artificers\Supports\ServiceRegister;
@@ -70,7 +71,9 @@ class Rayxsi extends Container {
 
         $this['event.dispatcher']->dispatch(new BootEvent($this));
 
-        return $this->make($httpKernel);
+        $rXsiAppKernel = $this->make($httpKernel);
+
+        $response = $rXsiAppKernel->resolve($request = Request::snap())->send();
     }
 
     /**
@@ -145,8 +148,12 @@ class Rayxsi extends Container {
         return $this->basePath;
     }
 
-    public function send(): void {
-        $this['router'];
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function basePath(string $path): string {
+        return $this->getBase().DIRECTORY_SEPARATOR.$path;
     }
 
     /**
@@ -215,8 +222,6 @@ class Rayxsi extends Container {
 
            unset($registers[$idx]);
        }
-
-
     }
 
     /**
@@ -235,6 +240,7 @@ class Rayxsi extends Container {
             'event.listener' => [\Artificers\Events\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
             'view' => [\Artificers\View\Generator::class],
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\EngineTreaties::class],
+            'cache' => [\Artificers\Cache\CacheManager::class],
             'router' => [\Artificers\Routing\Router::class],
             'request' => [\Artificers\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
@@ -289,13 +295,13 @@ class Rayxsi extends Container {
             $identifier = $this->resolveServiceRegister($identifier);
         }
 
-        //3. now call the register method of service registers to register with rayxsi.
-        $identifier->register();
-
         //4. call the boot method also
         if($this->isBooted()) {
             $identifier->boot();
         }
+
+        //3. now call the register method of service registers to register with rayxsi.
+        $identifier->register();
 
         //5. at last set mark to this service register that is applied.
         $this->markAsRegistered($identifier);

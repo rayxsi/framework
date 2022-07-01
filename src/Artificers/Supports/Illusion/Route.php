@@ -2,11 +2,15 @@
 
 namespace Artificers\Supports\Illusion;
 
+use Closure;
+
 /**
 * @method static \Artificers\Routing\Route get(string $uri, callable|string|array $action): Route
 * @method static \Artificers\Routing\Route post(string $uri, callable|string|array $action): Route
 * @method static \Artificers\Routing\Route delete(string $uri, callable|string|array $action): Route
 * @method static \Artificers\Routing\Route put(string $uri, callable|string|array $action): Route
+* @method static \Artificers\Routing\Route makeGroup(array $properties=[]): void
+ * @method static \Artificers\Routing\Router | \Artificers\Routing\RouteRegistrar group(array $properties, Closure|array|string $routes): void
  */
 
 class Route extends Illusion {

@@ -2,6 +2,7 @@
 
 use Artificers\Http\Response;
 use Artificers\Supports\Illusion\Env;
+use Artificers\Supports\Illusion\RXsiApp;
 use Artificers\Supports\Illusion\View;
 
 if(!function_exists('env')) {
@@ -21,6 +22,12 @@ if(!function_exists('dodo')) {
 if(!function_exists('response')) {
     function response(string $content = "", int $status = 200, array $headers = []): Response {
         return new Response($content, $status, $headers);
+    }
+}
+
+if(!function_exists('full_path')) {
+    function full_path(string $path): string {
+       return RXsiApp::basePath($path);
     }
 }
 

@@ -3,7 +3,7 @@
 namespace Artificers\Cache;
 
 class ViewCache {
-    private string $view;
+    private string $view = '';
 
     public function set(string $content): void {
         $this->view = $content;

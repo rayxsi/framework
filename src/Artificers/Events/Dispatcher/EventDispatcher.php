@@ -3,8 +3,6 @@
 namespace Artificers\Events\Dispatcher;
 
 use Artificers\Container\Container;
-use Artificers\Events\NotValidMethodException;
-use Artificers\Supports\Reflector;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
 use Artificers\Treaties\Events\EventDispatcherTreaties;
@@ -12,10 +10,8 @@ use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Treaties\Events\EventTreaties;
 use Artificers\Utilities\Ary;
 use Closure;
-use Exception;
-use ReflectionClass;
+use InvalidArgumentException;
 use ReflectionException;
-use ReflectionParameter;
 
 
 class EventDispatcher implements EventDispatcherTreaties {
@@ -30,8 +26,10 @@ class EventDispatcher implements EventDispatcherTreaties {
 
     /**
      * @inheritDoc
+     * @param object $event
      * @return mixed
-     * @throws NotValidMethodException
+     * @throws BindingException
+     * @throws NotFoundException
      * @throws ReflectionException
      */
     public function dispatch(object $event): mixed {
@@ -40,27 +38,32 @@ class EventDispatcher implements EventDispatcherTreaties {
             return $event;
         }
 
+        $params = array_merge($this->listener->getAllParams(), ['event'=>$event]);
+
         foreach($this->listener->getListenersForEvent($event) as $listener) {
 
-            //we can pass single listener. Like this UserServiceListener::class. Mechanix call by default handle method of listener. We can also use user defined method
+            //we can pass single listener. Like this UserServiceListener::class. Rayxsi call by default handle method of listener. We can also use user defined method
             //like this = 'UserServiceListener@User_defined_method'
             //we can pass multiple listeners. Like this using array = [UserServiceListener::class, UserServiceListener2::class]. Default call to handle method of listeners.
             //we can pass multiple listeners with user defined handler. Like this using array = ['UserServiceListener@store', 'UserServiceListener2@method'].
 
             if(is_string($listener)) {
-                $this->resolveWithIdentifier($listener, $event);
+                $this->call($listener, $params, 'handle');
             }
 
             if(Ary::isArr($listener)) {
                 foreach($listener as $actionListener) {
+
                     if(is_string($actionListener)) {
-                        $this->resolveWithIdentifier($actionListener, $event);
+                        $this->call($actionListener, $params, 'handle');
+                    }else {
+                        throw new InvalidArgumentException('Multiple listener must be array of string.');
                     }
                 }
             }
 
            if($listener instanceof Closure) {
-               $listener($event);
+               $this->call($listener, $params);
            }
 
         }
@@ -68,65 +71,20 @@ class EventDispatcher implements EventDispatcherTreaties {
         return $this;
     }
 
-    /**
-     * Resolve if listener is string.
-     * @param string $listener
-     * @param object $event
-     * @throws NotValidMethodException
-     * @throws ReflectionException
-     */
-    private function resolveWithIdentifier(string $listener,object $event) {
-        [$controller, $method] = str_contains($listener, '@') ? explode('@', $listener) : [$listener, 'handle']; //default is handle method.
-        $resolvedDependencies = $this->resolveDependenciesOfActionMethod($controller, $method, $event);
-
-        try {
-            $object = $this->container[$controller];
-        }catch (BindingException|NotFoundException $e) {
-            //if it's from Mechanix app by developers
-            $qualifiedClass = "RayxsiApp\\Listeners\\".$controller;
-            $object = $this->container[$qualifiedClass];
-        }
-
-        try {
-            call_user_func([$object, $method], ...$resolvedDependencies);
-        }catch(NotValidMethodException $e) {
-            throw new NotValidMethodException("Class {get_class($object)} does not have a method [$method]", $e->getCode());
-        }
-    }
 
     /**
      * @throws ReflectionException
-     * @throws Exception
+     * @throws NotFoundException
+     * @throws BindingException
      */
-    private function resolveDependenciesOfActionMethod(string $controller, string $method, object $event): array
-    {
-        $reflector = new ReflectionClass($controller);
-        $dependencies = $reflector->getMethod($method)->getParameters();
-
-        $buildStack = [];
-
-        foreach($dependencies as $dependency) {
-
-          $buildStack[] = is_null($className = Reflector::getParamClassName($dependency)) ? $this->resolveUnionType($dependency, $event) : $this->container[$className];
+    protected function call($listener, $params=[], $defaultMethod=null) {
+        try {
+            $this->container->call($listener, $params, $defaultMethod);
+        } catch (BindingException|NotFoundException $e) {
+            $qualifiedClass = "RayxsiApp\\Listeners\\".$listener;
+            $this->container->call($qualifiedClass, $params, $defaultMethod);
+        } catch (ReflectionException $e) {
+            throw new BindingException($e->getMessage(), $e->getCode());
         }
-
-        return $buildStack;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function resolveUnionType(ReflectionParameter $param, object $event): mixed {
-        $name = $param->getName();
-
-        if($name === 'event') return $event;
-
-        $paramFromListener = $this->listener->getAllParams();
-
-        if(empty($paramFromListener)) {
-            return null;
-        }
-
-        return $paramFromListener[$name] ?? throw new Exception('Parameter should be the same name');
     }
 }

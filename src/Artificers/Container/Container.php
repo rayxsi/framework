@@ -318,7 +318,7 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @throws BindingException
      * @throws NotFoundException
      */
-    protected function resolveDependencies(array $dependencies): array {
+    public function resolveDependencies(array $dependencies): array {
         $instancesArr = [];
 
         //1.Check all dependencies if there is any primitive type hint
@@ -495,5 +495,14 @@ class Container implements ArrayAccess, ContainerTreaties {
 
     public function __set(string $key, $value): void {
         $this[$key] = $value;
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws NotFoundException
+     * @throws BindingException
+     */
+    public function call(Closure|array|string $callback, array $params = [], $defaultMethod = null) {
+        return MethodHandler::call($this, $callback, $params, $defaultMethod);
     }
 }

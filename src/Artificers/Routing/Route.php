@@ -7,38 +7,46 @@ use Closure;
 
 class Route {
     /**
-    *Route name.
+    *Route properties.
      *
+     * @var array $properties
      */
-    public array $properties = [];
+    private array $properties = [];
 
     /**
-    *URI.
+    *Route uri.
      *
+     * @var string $uri
      */
     private string $uri;
 
     /**
     *Request method.
      *
+     * @var string $method
      */
     private string $method;
 
-    public Router $router;
+    /**
+     * Router.
+     *
+     * @var Router
+     */
+    private Router $router;
 
-    public Container $container;
-
-    public array $where = [];
+    /**
+     * Container.
+     *
+     * @var Container
+     */
+    private Container $container;
 
     public function __construct(string $method, string $uri, Closure|string $action) {
         $this->method = $method;
         $this->uri = $uri;
-        $this->properties['controller'] = $action;
-
+        $this->properties['action'] = $action;
         $this->setToUriArgList();
     }
-
-
 
     /**
     *Get the route name.
@@ -46,7 +54,7 @@ class Route {
      * @return mixed
      */
     public function getName(): mixed {
-        return $this->properties['as'] ?? null;
+        return $this->properties['name'] ?? null;
     }
 
     /**
@@ -55,10 +63,29 @@ class Route {
      * @param string $name
      * @return self
      */
-    public function name(string $name): self {
-       $this->properties['as'] = isset($this->properties['as']) ? $this->properties['as'].$name : $name;
+    public function setName(string $name): self {
+       $this->properties['name'] = isset($this->properties['name']) ? $this->properties['name'].$name : $name;
 
        return $this;
+    }
+
+    /**
+     * Set Route Properties.
+     *
+     * @param array $props
+     * @return void
+     */
+    public function setProperties(array $props): void {
+        $this->properties = $props;
+    }
+
+    /**
+     * Get Route properties.
+     *
+     * @return array
+     */
+    public function getProperties(): array {
+        return $this->properties;
     }
 
     /**
@@ -79,6 +106,12 @@ class Route {
         return $this->uri;
     }
 
+    /**
+     * Set URI.
+     *
+     * @param string $exp
+     * @return $this
+     */
     public function setUri(string $exp): self {
         $this->uri = $exp;
         return $this;
@@ -90,20 +123,22 @@ class Route {
      * @return Closure|string
      */
     public function getAction(): Closure|string {
-        return $this->properties['controller'];
+        return $this->properties['action'];
     }
 
     /**
+     * Get action method.
+     *
      * @return Closure|string
      */
     public function getActionHandler(): Closure|string {
-        if(is_string($controller = $this->properties['controller'])) {
+        if(is_string($controller = $this->properties['action'])) {
             $actionProp = explode('@', $controller);
 
             return $actionProp[1];
         }
 
-        return $this->properties['controller'];
+        return $this->properties['action'];
     }
 
     /**
@@ -127,12 +162,19 @@ class Route {
 
     public function where(string|array $placeholder, string $exp = null): self {
         foreach($this->parseWhereClause($placeholder, $exp) as $name=>$expression) {
-            $this->where[$name] = $expression;
+            $this->properties['where'][$name] = $expression;
         }
 
         return $this;
     }
 
+    /**
+     * Wrap the where clause.
+     *
+     * @param string|array $placeholder
+     * @param string $exp
+     * @return string[]
+     */
     protected function parseWhereClause(string|array $placeholder, string $exp):  array {
         return is_array($placeholder) ? $placeholder : [$placeholder=>$exp];
     }
@@ -159,6 +201,38 @@ class Route {
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Set middleware.
+     *
+     * @param array|string|null $middleware
+     * @return $this
+     */
+    public function middleware(array|string|null $middleware): static {
+        $this->properties['middleware'] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Set prefix.
+     *
+     * @param string $prefix
+     * @return $this
+     */
+    public function prefix(string $prefix = ""): static {
+        $this->properties['prefix'] = trim($prefix, '/');
+
+        return $this;
+    }
+
+    public function setArgs($key, $value): void {
+        $this->properties['args'][$key] = $value;
+    }
+
+    public function unsetArgs($key): void {
+        unset($this->properties['args'][$key]);
     }
 
     /**

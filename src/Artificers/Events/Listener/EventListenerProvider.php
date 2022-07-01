@@ -37,7 +37,7 @@ class EventListenerProvider implements EventListenerProviderTreaties {
      * @param array $params
      * @return self
      */
-    public function addEventListener(string $type, callable|string|array $listeners, array $params=[]): self {
+    public function addEventListener(string $type, callable|string|array $listeners, array $params = []): self {
         $this->eventMapToListeners[$type][] = $listeners;
         $this->parameters = $params;
 

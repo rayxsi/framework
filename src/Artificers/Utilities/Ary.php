@@ -40,6 +40,8 @@ class Ary {
     }
 
     /**
+     * Set array at leaf.
+     *
      * @param $array
      * @param $key
      * @param $value
@@ -100,5 +102,21 @@ class Ary {
         }
 
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    public static function wrap(mixed $args): array {
+        return is_array($args) ? $args : [$args];
+    }
+
+    public static function make(mixed ...$args): array {
+        return $args;
+    }
+
+    public static function map(array $array, $callback) {
+        return array_map($callback, $array);
+    }
+
+    public static function pop(array &$array): void {
+        array_pop($array);
     }
 }
