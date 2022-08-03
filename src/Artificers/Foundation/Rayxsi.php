@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Artificers\Foundation;
 
-use Artificers\Cache\CacheServiceRegister;
 use Artificers\Container\Container;
 use Artificers\Events\EventServiceRegister;
 use Artificers\Foundation\Bootstrap\Environment;
@@ -11,7 +10,6 @@ use Artificers\Foundation\Bootstrap\LoadConfigFiles;
 use Artificers\Foundation\Bootstrap\ServiceRegisters;
 use Artificers\Foundation\Config\Config;
 use Artificers\Foundation\Config\ErrorHandling;
-use Artificers\Foundation\Environment\Env;
 use Artificers\Foundation\Environment\EnvServiceRegister;
 use Artificers\Foundation\Events\BootEvent;
 use Artificers\Http\Request;
@@ -20,11 +18,7 @@ use Artificers\Supports\Illusion\Illusion;
 use Artificers\Supports\ServiceRegister;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
-
 use Artificers\Utilities\Ary;
-use Artificers\View\ViewServiceRegister;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 
 class Rayxsi extends Container {
@@ -241,6 +235,7 @@ class Rayxsi extends Container {
             'view' => [\Artificers\View\Generator::class],
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\EngineTreaties::class],
             'cache' => [\Artificers\Cache\CacheManager::class],
+            'db' => [\Artificers\Database\DatabaseManager::class],
             'router' => [\Artificers\Routing\Router::class],
             'request' => [\Artificers\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
@@ -259,9 +254,14 @@ class Rayxsi extends Container {
      * @return void
      */
     private function registerFoundationBindings(): void {
+        static::setToInstance($this);
         $this->setInstance('rXsiApp', $this);
         $this->setInstance(Container::class, $this);
         Illusion::setIllusionApplication($this);
+    }
+
+    protected static function setToInstance(Container|Rayxsi $rXsiApp = null): void {
+        static::$instance = $rXsiApp;
     }
 
     /**

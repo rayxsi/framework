@@ -12,7 +12,7 @@ abstract class ServiceRegister {
     }
 
     /**
-    *Register services with Mechanix.
+    *Register services with Rayxsi.
      *
      * This method could be overwritten.
      *

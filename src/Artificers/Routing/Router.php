@@ -213,7 +213,7 @@ class Router {
     }
 
     /**
-     * prepare view engine.
+     * Prepare view engine.
      *
      * @return void
      */

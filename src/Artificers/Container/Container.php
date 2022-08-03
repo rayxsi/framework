@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Artificers\Container;
 
 use ArrayAccess;
+use Artificers\Supports\Illusion\RXsiApp;
 use Artificers\Supports\Reflector;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\ContainerTreaties;
@@ -24,6 +25,8 @@ class Container implements ArrayAccess, ContainerTreaties {
      */
     protected  array $bindings = [];
 
+    protected static Container|null $instance = null;
+
     /**
      *Automatically resolve class and dependencies goes to resolved array.
      *
@@ -32,14 +35,14 @@ class Container implements ArrayAccess, ContainerTreaties {
     protected array $resolved = [];
 
     /**
-     *All mechanix framework singleton class instances goes to instances array.
+     *All rayxsi framework singleton class instances goes to instances array.
      *
      * @var array $instances
      */
     protected array $instances = [];
 
     /**
-     *All mechanix framework class aliases goes to aliases array.
+     *All rayxsi framework class aliases goes to aliases array.
      *
      * @var array $aliases
      */
@@ -457,6 +460,22 @@ class Container implements ArrayAccess, ContainerTreaties {
         $this->instances[$identifier] = $instance;
 
         return $instance;
+    }
+
+    public static function makeInstance(): Container {
+        if(is_null(static::$instance)) {
+            static::$instance = new static;
+        }
+
+        return static::$instance;
+    }
+
+    public function clean() {
+        $this->instances = [];
+        $this->resolved = [];
+        $this->aliases = [];
+        $this->bindings = [];
+        $this->variadicBindings = [];
     }
 
     public function __get(string $key) {

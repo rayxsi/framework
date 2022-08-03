@@ -1,5 +1,7 @@
 <?php
+declare(strict_types=1);
 
+use Artificers\Container\Container;
 use Artificers\Http\Response;
 use Artificers\Supports\Illusion\Env;
 use Artificers\Supports\Illusion\RXsiApp;
@@ -28,6 +30,12 @@ if(!function_exists('response')) {
 if(!function_exists('full_path')) {
     function full_path(string $path): string {
        return RXsiApp::basePath($path);
+    }
+}
+
+if(!function_exists('rXsiApp')) {
+    function rXsiApp(): Container {
+        return Container::makeInstance();
     }
 }
 

@@ -6,13 +6,13 @@ use Artificers\Supports\ServiceRegister;
 use Closure;
 
 class RouteServiceRegister extends ServiceRegister {
-    public Closure $loadRoutesUsingCallback;
+    public Closure|null $loadRoutesUsingCallback;
 
     public function register(): void {
        $this->loadRoutes();
 
         $this->rXsiApp->booted(function($rXsiApp) {
-            $this->rXsiApp['router']->getRoutes()->refreshNameList();
+            $rXsiApp['router']->getRoutes()->refreshNameList();
         });
     }
 
@@ -21,8 +21,9 @@ class RouteServiceRegister extends ServiceRegister {
     }
 
     protected function loadRoutes(): void {
-        //we need to change it to resolve call back dependencies.
-        call_user_func($this->loadRoutesUsingCallback);
+        if(!is_null($this->loadRoutesUsingCallback)) {
+            $this->rXsiApp->call($this->loadRoutesUsingCallback);
+        }
     }
 
     /**

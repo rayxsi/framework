@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Artificers\Foundation\Http;
 
@@ -27,6 +28,4 @@ class Kernel implements HttpKernelTreaties {
 
         return $this->router->resolveWithRouter($request);
     }
-
-
 }
