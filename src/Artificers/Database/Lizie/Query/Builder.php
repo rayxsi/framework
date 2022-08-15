@@ -2,7 +2,6 @@
 
 namespace Artificers\Database\Lizie\Query;
 
-class Builder
-{
+class Builder {
 
 }

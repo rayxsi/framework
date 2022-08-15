@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Artificers\Database\Lizie\Connections;
 
 use Artificers\Database\Lizie\Driver\Exception;
+use Artificers\Database\Lizie\Schema\Grammars\Grammar;
+use Artificers\Database\Lizie\Schema\Schema as SchemaBuilder;
 use Artificers\Database\Lizie\Type;
 use Artificers\Treaties\Database\Driver\Driver;
 
@@ -14,13 +16,17 @@ use Artificers\Treaties\Database\PDO\Connection as DriverConnection;
 class Connection {
     protected Driver $_driver;
 
-    protected ?DriverConnection $_connection;
+    protected string $schema;
+
+    protected ?DriverConnection $_connection = null;
 
     protected int $transactionLevel = 0;
 
     protected array $cachedSql = [];
 
     protected array $params = [];
+
+    protected Grammar $schemaGrammar;
 
     public function __construct(array $params, Driver $driver) {
         $this->params = $params;
@@ -224,5 +230,38 @@ class Connection {
 
     public function inTransaction(): bool {
         return $this->getConnection()->inTransaction();
+    }
+
+    public function getSchemaBuilder(): SchemaBuilder {
+        return new SchemaBuilder($this);
+    }
+
+    /**
+     * Set schema grammar.
+     *
+     * @param Grammar $grammar
+     * @return $this
+     */
+    public function setSchemaGrammar(Grammar $grammar): static {
+        $this->schemaGrammar = $grammar;
+
+        return $this;
+    }
+
+    /**
+     * Get schema grammar.
+     *
+     * @return Grammar
+     */
+    public function getSchemaGrammar(): Grammar {
+        return $this->schemaGrammar;
+    }
+
+    public function getSchema(): string {
+        return $this->schema;
+    }
+
+    public function setSchema(string $schema): void {
+        $this->schema = $schema;
     }
 }

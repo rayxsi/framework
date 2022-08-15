@@ -2,7 +2,8 @@
 
 namespace Artificers\Database\Lizie\Schema\Exceptions;
 
-class ForeignKeyException extends \Exception
-{
+use Exception;
+
+class ForeignKeyException extends Exception {
 
 }

@@ -28,4 +28,8 @@ final class Type {
      * Represents a boolean data type.
      */
     public const PARAM_BOOL = 5;
+
+    private function __construct() {
+
+    }
 }

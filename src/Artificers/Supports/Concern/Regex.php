@@ -12,4 +12,8 @@ trait Regex {
 
         return $matches[0];
     }
+
+    protected function replace(string $pattern, string $string, string $input): array|string|null {
+        return preg_replace($pattern, $input, $string);
+    }
 }

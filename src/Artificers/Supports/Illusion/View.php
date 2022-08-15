@@ -3,7 +3,7 @@
 namespace Artificers\Supports\Illusion;
 
 /**
-* @method static \Artificers\Supports\Illusion\View generate(): string
+* @method static \Artificers\View\View generate(): void
  */
 class View extends Illusion {
     protected static function getIllusionAccessor(): string {

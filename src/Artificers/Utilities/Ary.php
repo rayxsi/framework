@@ -116,6 +116,11 @@ class Ary {
         return array_map($callback, $array);
     }
 
+    public static function merge(array ...$args): array {
+
+        return array_merge(...$args);
+    }
+
     public static function pop(array &$array): void {
         array_pop($array);
     }

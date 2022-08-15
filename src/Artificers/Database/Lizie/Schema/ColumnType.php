@@ -2,10 +2,10 @@
 
 namespace Artificers\Database\Lizie\Schema;
 
-final class DataType {
-    public const VARCHAR = 0;
+final class ColumnType {
+    public const VARCHAR = "VARCHAR";
 
-    public const INT = 1;
+    public const INT = "INT";
 
     private function __construct(){}
 }

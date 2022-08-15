@@ -35,7 +35,7 @@ final class Connection implements ConnectionTreaties {
 
             return new Statement($stmt);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -50,7 +50,7 @@ final class Connection implements ConnectionTreaties {
             assert($row !== false);
             return $row;
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -66,7 +66,7 @@ final class Connection implements ConnectionTreaties {
 
             return new Result($stmt);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -85,7 +85,7 @@ final class Connection implements ConnectionTreaties {
         try {
             return $this->connection->beginTransaction();
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -97,7 +97,7 @@ final class Connection implements ConnectionTreaties {
         try {
             return $this->connection->commit();
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
 
     }
@@ -110,7 +110,7 @@ final class Connection implements ConnectionTreaties {
         try {
             return $this->connection->rollBack();
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -127,7 +127,7 @@ final class Connection implements ConnectionTreaties {
 
             return $this->connection->lastInsertId($name);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 

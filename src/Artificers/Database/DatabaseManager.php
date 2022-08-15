@@ -23,7 +23,7 @@ class DatabaseManager {
     /**
      * @throws Exception
      */
-    public function connect(): Connection {
+    public function connection(): Connection {
         try {
             if(is_null($this->connection)) {
                 $this->connection = Manager::make($this->params);

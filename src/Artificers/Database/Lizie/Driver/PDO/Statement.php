@@ -26,7 +26,7 @@ final class Statement implements StatementTreaties{
         try {
             return $this->stmt->bindValue($param, $value, $type);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -38,7 +38,7 @@ final class Statement implements StatementTreaties{
         try {
             return $this->stmt->bindParam($param, $var, $type, $maxLength, $driverOptions);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -50,7 +50,7 @@ final class Statement implements StatementTreaties{
         try {
             return $this->stmt->bindColumn($column, $var, $type, $maxLength, $driverOptions);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -62,7 +62,7 @@ final class Statement implements StatementTreaties{
         try {
             $this->stmt->execute($params);
         }catch(PDOException $e) {
-            throw new DriverException($e->getMessage(), $e->getCode());
+            throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
 
         return new Result($this->stmt);

@@ -28,7 +28,7 @@ final class Driver implements DriverTreaties {
         try{
             $pdo = new PDO($dsn, $params['user'], $params['password'], $driverOption);
         }catch(PDOException $e) {
-            throw new Exception('Connection failed', $e->getCode());
+            throw new Exception("Connection failed. [{$e->getMessage()}]", $e->getCode());
         }
 
         return new Connection($pdo);

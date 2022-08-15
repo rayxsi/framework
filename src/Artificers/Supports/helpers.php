@@ -39,3 +39,19 @@ if(!function_exists('rXsiApp')) {
     }
 }
 
+if(!function_exists("auto")) {
+
+    /**
+     * Call a callback and returns its value.
+     *
+     * @param mixed $value
+     * @param Closure|null $callback
+     * @return mixed
+     */
+    function auto(mixed $value, Closure|null $callback=null): mixed {
+        $callback($value);
+
+        return $value;
+    }
+}
+

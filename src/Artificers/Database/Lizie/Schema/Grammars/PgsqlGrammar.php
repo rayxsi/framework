@@ -2,7 +2,8 @@
 
 namespace Artificers\Database\Lizie\Schema\Grammars;
 
-class PgsqlGrammar extends Grammar
-{
+final class PgsqlGrammar extends Grammar {
+    public function createTableIfNotExists() {
 
+    }
 }
