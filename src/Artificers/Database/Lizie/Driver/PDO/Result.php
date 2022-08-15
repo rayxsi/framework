@@ -182,7 +182,7 @@ final class Result implements ResultTreaties {
      */
     private function fetch(int $mode = PDO::FETCH_DEFAULT): mixed {
         try {
-            return $this->fetch($mode);
+            return $this->stmt->fetch($mode);
         }catch(PDOException $e) {
             throw new DriverException($e->getMessage(), $e->getCode());
         }
@@ -195,7 +195,7 @@ final class Result implements ResultTreaties {
      */
     private function fetchAll(int $mode): array|false {
         try {
-            return $this->fetchAll($mode);
+            return $this->stmt->fetchAll($mode);
         }catch(PDOException $e) {
             throw new DriverException($e->getMessage(), $e->getCode());
         }
