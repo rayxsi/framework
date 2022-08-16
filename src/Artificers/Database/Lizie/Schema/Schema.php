@@ -41,15 +41,6 @@ class Schema {
     /**
      * @throws Exception
      */
-    public function dropTableIfExists(string $tableName): void {
-        $this->build(auto($this->createBluePrint($tableName), function($table) {
-            $table->dropIfExists();
-        }));
-    }
-
-    /**
-     * @throws Exception
-     */
     public function table(string $name, Closure $callback): void {
         $this->build(auto($this->createBluePrint($name), function($table) use($callback) {
             $callback($table);
@@ -63,5 +54,47 @@ class Schema {
     public function exists(string $table): bool {
         $result = $this->connection->runQuery($this->grammar->compileTableExists(), [$this->connection->getSchema(), $table]);
         return count($result->fetchAllRowsAsNumeric()) > 0;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createDatabase(string $name): bool {
+        if($this->connection->runQuery($this->grammar->compileCreateDatabaseIfNotExists($name))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function use(string $database): bool {
+        if($this->connection->runQuery($this->grammar->compileUseDatabase($database))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function dropIfExists(): bool {
+        if($this->connection->runQuery($this->grammar->compileDropDatabaseIfExists($this->connection->getSchema()))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function dropTableIfExists(string $tableName): void {
+        $this->build(auto($this->createBluePrint($tableName), function($table) {
+            $table->dropIfExists();
+        }));
     }
 }

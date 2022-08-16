@@ -9,8 +9,6 @@ use Artificers\Utilities\Ary;
 class Arranger {
     private array $preparedColumns;
 
-    private array $indexes = [];
-
     private array $pkColumns = [];
 
     private array $fKeyClauses = [];
@@ -30,9 +28,9 @@ class Arranger {
 
     public function arrange(): array {
         if(count($this->pkColumns) === 1) {
-            $this->pKeyClauses[] = $this->grammar->compilePrimaryKey($this->pkColumns[0]);
+            $this->pKeyClauses[] = $this->grammar->compilePrimaryKey($this->pkColumns);
         }else {
-            $this->pKeyClauses[] = $this->grammar->compilePrimaryKeyConstraint($this->table->getName(), implode(", ", $this->pkColumns));
+            $this->pKeyClauses[] = $this->grammar->compilePrimaryKeyConstraint($this->table, $this->pkColumns);
         }
 
         return Ary::merge($this->preparedColumns, $this->pKeyClauses, $this->fKeyClauses);
@@ -72,10 +70,6 @@ class Arranger {
 
             if(!empty($condition = $column->getCheckable())) {
                 $attributes .= " {$grammar->compileCheck($condition)}";
-            }
-
-            if($column->isIndex()) {
-                $this->indexes[] = $column->getName();
             }
 
             if($column->isPrimaryKey()) {

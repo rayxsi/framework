@@ -23,8 +23,6 @@ class Column {
 
     private mixed $default = false;
 
-    private bool $indexing = false;
-
     private string $references = "";
 
     public function __construct(string $name) {
@@ -58,11 +56,6 @@ class Column {
 
     public function primaryKey(): static {
         $this->primaryKey = true;
-        return $this;
-    }
-
-    public function index(): static {
-        $this->indexing = true;
         return $this;
     }
 

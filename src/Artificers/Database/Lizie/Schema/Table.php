@@ -54,6 +54,8 @@ class Table {
      * @throws Exception
      */
     public function build(Connection $connection, Grammar $grammar): void {
+//        dump($this->mapToSql($connection, $grammar));
+//        die();
         foreach($this->mapToSql($connection, $grammar) as $sql) {
             $connection->runQuery($sql);
         }
@@ -75,6 +77,16 @@ class Table {
         return $statements;
     }
 
+    public function index(...$columns): void {
+        $this->addCommand("createIndex", compact('columns'));
+    }
+
+    public function uniqueIndex(...$columns): void {
+        $unique = true;
+
+        $this->addCommand("createIndex", compact('columns', 'unique'));
+    }
+
     public function dropIfExists(): void {
         $this->addCommand("dropIfExists");
     }
@@ -83,8 +95,20 @@ class Table {
         $this->addCommand("dropPrimaryKey");
     }
 
-    public function dropForeignKey(string $identifier): void {
-        $this->addCommand("dropForeignKey", compact("identifier"));
+    public function dropForeignKey(string $index): void {
+        $this->addCommand("dropForeignKey", compact("index"));
+    }
+
+    public function dropColumn(string $index): void {
+        $this->addCommand("dropColumn", compact("index"));
+    }
+
+    public function dropUnique(string $index): void {
+        $this->dropIndex($index);
+    }
+
+    public function dropIndex(string $index): void {
+        $this->addCommand("dropIndex", compact('index'));
     }
 
     public function getName(): string {
