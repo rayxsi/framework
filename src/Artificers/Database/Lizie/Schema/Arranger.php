@@ -20,16 +20,22 @@ class Arranger {
     /**
      * @throws ForeignKeyException
      */
-    public function __construct(Table $table, Grammar $grammar) {
+    public function __construct(Table $table, Grammar $grammar, array $columns = []) {
         $this->table = $table;
         $this->grammar = $grammar;
-        $this->prepare($table, $grammar);
+        $this->prepare($table, $grammar, $columns);
     }
 
+    /**
+     * Arrange all the columns and primary key constraint.
+     * @return array
+     */
     public function arrange(): array {
         if(count($this->pkColumns) === 1) {
             $this->pKeyClauses[] = $this->grammar->compilePrimaryKey($this->pkColumns);
-        }else {
+        }
+
+        if(count($this->pkColumns) > 1) {
             $this->pKeyClauses[] = $this->grammar->compilePrimaryKeyConstraint($this->table, $this->pkColumns);
         }
 
@@ -37,10 +43,14 @@ class Arranger {
     }
 
     /**
+     * Prepare all the table columns to appropriate SQL style.
+     * @param Table $table
+     * @param Grammar $grammar
+     * @param array $columns
      * @throws ForeignKeyException
      */
-    private function prepare(Table $table, Grammar $grammar): void {
-        $columns = $table->getColumns();
+    private function prepare(Table $table, Grammar $grammar, array $columns=[]): void {
+        $columns = empty($columns)? $table->getColumns() : $columns;
         $attributes = "";
 
         foreach($columns as $column) {
@@ -49,11 +59,20 @@ class Arranger {
             }
 
             if(!empty($type = $column->getType())) {
-                $attributes .= " {$type}({$column->getWidth()})";
+
+                if($type === ColumnType::ENUM || $type === ColumnType::SET) {
+                    $attributes .= " {$type}(".implode(',', $column->getOptions()).")";
+                }else if($type !== ColumnType::DTIME && $type !== ColumnType::TIME && $type !== ColumnType::TIMESTAMP) {
+                    $attributes .= " {$type}({$column->getWidth()})";
+                }else {
+                    $attributes .= " {$type}";
+                }
             }
 
             if($column->isNullable()) {
-                $attributes .= " {$grammar->compileNotNull()}";
+                $attributes .= " {$grammar->compileNullAble()}";
+            }else {
+                $attributes .= " {$grammar->compileNotNullAble()}";
             }
 
             if($column->isAutoIncrement()) {

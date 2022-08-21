@@ -8,6 +8,7 @@ use Artificers\Database\Lizie\Exception\DriverRequiredException;
 use Artificers\Database\Lizie\Exception\UnknownDriverException;
 use Artificers\Database\Lizie\Schema\Grammars\MysqlGrammar;
 use Artificers\Database\Lizie\Schema\Grammars\PgsqlGrammar;
+use Artificers\Database\Lizie\Schema\Schema;
 
 class Manager {
     /**
@@ -29,6 +30,9 @@ class Manager {
     ];
 
     /**
+     * Generate database connection and return it.
+     * @param array $params
+     * @return Connection
      * @throws DriverRequiredException
      * @throws UnknownDriverException
      */
@@ -43,6 +47,7 @@ class Manager {
     }
 
     /**
+     * Create appropriate driver instance.
      * @param array $params
      * @return mixed
      * @throws UnknownDriverException
@@ -64,8 +69,11 @@ class Manager {
     }
 
     /**
-     * @throws UnknownDriverException
+     * Create schema grammar.
+     * @param array $params
+     * @return mixed
      * @throws DriverRequiredException
+     * @throws UnknownDriverException
      */
     private static function makeSchemaGrammar(array $params): mixed {
         if(isset($params['driver'])) {
@@ -79,5 +87,9 @@ class Manager {
         }
 
         throw new DriverRequiredException('Driver is required :(');
+    }
+
+    public static function schema(Connection $connection): Schema {
+        return new Schema($connection);
     }
 }

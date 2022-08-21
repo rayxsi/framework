@@ -29,6 +29,11 @@ final class Type {
      */
     public const PARAM_BOOL = 5;
 
+    /**
+     * Flag to denote a string uses the regular character set.
+     */
+    public const PARAM_STR_CHAR = 536870912;
+
     private function __construct() {
 
     }

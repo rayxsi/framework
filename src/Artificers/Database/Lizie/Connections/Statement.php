@@ -26,6 +26,7 @@ class Statement {
     }
 
     /**
+     * Binds a value to a parameter.
      * @param int|string $param
      * @param mixed $value
      * @param int $type
@@ -44,6 +45,13 @@ class Statement {
     }
 
     /**
+     * Binds a parameter to the specified variable name.
+     * @param int|string $param
+     * @param mixed $var
+     * @param int $type
+     * @param int $maxLength
+     * @param mixed|null $driverOptions
+     * @return bool
      * @throws Exception
      */
     public function bindParam(int|string $param, mixed &$var, int $type = Type::PARAM_STR, int $maxLength = 0, mixed $driverOptions = null): bool {
@@ -61,6 +69,7 @@ class Statement {
     }
 
     /**
+     * Bind a column to a PHP variable.
      * @param string|int $column
      * @param mixed $var
      * @param int $type
@@ -84,6 +93,7 @@ class Statement {
     }
 
     /**
+     * Executes a prepared statement.
      * @param mixed $params
      * @return Result
      * @throws Exception

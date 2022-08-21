@@ -34,6 +34,8 @@ class Connection {
     }
 
     /**
+     * Generate a driver connection.
+     *
      * @return bool
      */
     protected function _connect(): bool {
@@ -47,6 +49,8 @@ class Connection {
     }
 
     /**
+     * Prepare a sql command.
+     *
      * @param string $sql
      * @return Statement
      * @throws DriverException
@@ -63,9 +67,11 @@ class Connection {
     }
 
     /**
+     * Generate the connection and return it.
+     *
     * @return DriverConnection
      */
-    public function getConnection(): DriverConnection {
+    protected function getConnection(): DriverConnection {
         $this->_connect();
 
         assert($this->_connection !== null);
@@ -78,6 +84,8 @@ class Connection {
     }
 
     /**
+     * Prepare the sql command, bind the value, execute the sql statement and return the result object.
+     *
      * @param string $sql
      * @param array $params
      * @param bool $forceToCache
@@ -107,6 +115,11 @@ class Connection {
     }
 
     /**
+     * Prepare the cached sql command, bind the value, execute the sql statement and return the result object.
+     *
+     * @param string $cacheAlias
+     * @param array $params
+     * @return Result
      * @throws Exception
      */
     public function runCachedQuery(string $cacheAlias, array $params = []): Result {
@@ -132,6 +145,13 @@ class Connection {
         throw new Exception('Undefined cache alias.');
     }
 
+    /**
+     * Quotes a string for use in a query.
+     *
+     * @param string $string
+     * @param int $type
+     * @return string|false
+     */
     public function quote(string $string, int $type = Type::PARAM_STR): string|false {
         $connection = $this->getConnection();
 
@@ -139,6 +159,8 @@ class Connection {
     }
 
     /**
+     * Start the database transaction.
+     *
      * @throws Exception
      */
     public function startTransaction(): bool {
@@ -164,6 +186,8 @@ class Connection {
     }
 
     /**
+     * Save the transaction.
+     *
      * @throws Exception
      */
     public function commit(): bool {
@@ -189,6 +213,8 @@ class Connection {
     }
 
     /**
+     * Revert the transaction.
+     *
      * @throws Exception
      */
     public function rollback(): bool {
@@ -213,11 +239,20 @@ class Connection {
         return $result;
     }
 
+    /**
+     * Generate save point marker.
+     *
+     * @return string
+     */
     protected function _generateSavePointMarker(): string {
         return "LIZIE_POINTER_{$this->transactionLevel}";
     }
 
     /**
+     * Get the id of last inserted record.
+     *
+     * @param string|null $name
+     * @return string|false
      * @throws Exception
      */
     public function lastInsertedId(?string $name = null): string|false {
@@ -228,10 +263,20 @@ class Connection {
         }
     }
 
+    /**
+     * Check if in transaction or not.
+     *
+     * @return bool
+     */
     public function inTransaction(): bool {
         return $this->getConnection()->inTransaction();
     }
 
+    /**
+     * Return the schema object.
+     *
+     * @return SchemaBuilder
+     */
     public function getSchemaBuilder(): SchemaBuilder {
         return new SchemaBuilder($this);
     }
@@ -257,10 +302,21 @@ class Connection {
         return $this->schemaGrammar;
     }
 
+    /**
+     * Return the database schema name.
+     *
+     * @return string
+     */
     public function getSchema(): string {
         return $this->schema;
     }
 
+    /**
+     * Set the database schema name.
+     *
+     * @param string $schema
+     * @return void
+     */
     public function setSchema(string $schema): void {
         $this->schema = $schema;
     }

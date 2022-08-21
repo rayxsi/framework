@@ -3,11 +3,19 @@
 namespace Artificers\Foundation\Supports\Registers;
 
 use Artificers\Supports\ServiceRegister;
+use Artificers\Treaties\Container\BindingException;
+use Artificers\Treaties\Container\NotFoundException;
 use Closure;
+use ReflectionException;
 
 class RouteServiceRegister extends ServiceRegister {
     public Closure|null $loadRoutesUsingCallback;
 
+    /**
+     * @throws ReflectionException
+     * @throws NotFoundException
+     * @throws BindingException
+     */
     public function register(): void {
        $this->loadRoutes();
 
@@ -20,6 +28,11 @@ class RouteServiceRegister extends ServiceRegister {
         // TODO
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws NotFoundException
+     * @throws BindingException
+     */
     protected function loadRoutes(): void {
         if(!is_null($this->loadRoutesUsingCallback)) {
             $this->rXsiApp->call($this->loadRoutesUsingCallback);
