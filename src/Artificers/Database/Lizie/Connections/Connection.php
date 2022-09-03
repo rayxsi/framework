@@ -5,6 +5,7 @@ namespace Artificers\Database\Lizie\Connections;
 
 use Artificers\Database\Lizie\Driver\Exception;
 use Artificers\Database\Lizie\Schema\Grammars\Grammar;
+use Artificers\Database\Lizie\Query\Grammars\Grammar as QueryGrammar;
 use Artificers\Database\Lizie\Schema\Schema as SchemaBuilder;
 use Artificers\Database\Lizie\Type;
 use Artificers\Treaties\Database\Driver\Driver;
@@ -27,6 +28,7 @@ class Connection {
     protected array $params = [];
 
     protected Grammar $schemaGrammar;
+    protected QueryGrammar $queryGrammar;
 
     public function __construct(array $params, Driver $driver) {
         $this->params = $params;
@@ -294,12 +296,33 @@ class Connection {
     }
 
     /**
+     * Set query grammar.
+     *
+     * @param QueryGrammar $grammar
+     * @return $this
+     */
+    public function setQueryGrammar(QueryGrammar $grammar):static {
+        $this->queryGrammar = $grammar;
+
+        return $this;
+    }
+
+    /**
      * Get schema grammar.
      *
      * @return Grammar
      */
     public function getSchemaGrammar(): Grammar {
         return $this->schemaGrammar;
+    }
+
+    /**
+     * Get query grammar.
+     *
+     * @return QueryGrammar
+     */
+    public function getQueryGrammar(): QueryGrammar {
+        return $this->queryGrammar;
     }
 
     /**

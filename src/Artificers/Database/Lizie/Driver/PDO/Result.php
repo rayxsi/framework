@@ -13,11 +13,16 @@ use PDOStatement;
 final class Result implements ResultTreaties {
 
     private PDOStatement $stmt;
+    private bool $executionStatus;
 
-    public function __construct(PDOStatement $stmt) {
+    public function __construct(PDOStatement $stmt, bool $executionStatus) {
         $this->stmt = $stmt;
+        $this->executionStatus = $executionStatus;
     }
 
+    public function getExecStatus(): bool {
+        return $this->executionStatus;
+    }
 
     /**
      * @inheritDoc
@@ -139,7 +144,7 @@ final class Result implements ResultTreaties {
      * @inheritDoc
      * @throws Exception
      */
-    public function fetchAllRowsAsObject(): object|false {
+    public function fetchAllRowsAsObject(): array|false {
         return $this->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -190,10 +195,10 @@ final class Result implements ResultTreaties {
 
     /**
      * @param int $mode
-     * @return array|false
+     * @return array|bool
      * @throws Exception
      */
-    private function fetchAll(int $mode): array|false {
+    private function fetchAll(int $mode): array|bool {
         try {
             return $this->stmt->fetchAll($mode);
         }catch(PDOException $e) {

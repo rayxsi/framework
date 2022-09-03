@@ -8,13 +8,17 @@ use Artificers\Treaties\Database\Driver\Exception as DriverException;
 use Artificers\Treaties\Database\Result as ResultTreaties;
 use Exception;
 
-class Result implements ResultTreaties {
+class Result implements ResultTreaties{
     private DriverResult $result;
     private Connection $connection;
 
     public function __construct(DriverResult $result, Connection $connection) {
         $this->result = $result;
         $this->connection = $connection;
+    }
+
+    public function getExecStatus(): bool {
+        return $this->result->getExecStatus();
     }
 
     /**
@@ -179,7 +183,7 @@ class Result implements ResultTreaties {
      * @inheritDoc
      * @throws Exception
      */
-    public function fetchAllRowsAsObject(): object|false {
+    public function fetchAllRowsAsObject(): array|false {
         try {
             return $this->result->fetchAllRowsAsObject();
         }catch(DriverException $e) {

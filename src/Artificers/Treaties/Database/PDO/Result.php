@@ -132,11 +132,11 @@ interface Result {
     /**
      * Fetches all rows from a result set as associative array.
      *
-     * @return Object|false
+     * @return array|false
      *
      * @throws Exception
      */
-    public function fetchAllRowsAsObject(): Object|false;
+    public function fetchAllRowsAsObject(): array|false;
 
     /**
      * Returns an array containing all rows indexed by column number starting at column 0.

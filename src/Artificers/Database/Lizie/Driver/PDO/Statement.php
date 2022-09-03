@@ -65,6 +65,6 @@ final class Statement implements StatementTreaties{
             throw new DriverException($e->getMessage(), (int)$e->getCode());
         }
 
-        return new Result($this->stmt);
+        return new Result($this->stmt, true);
     }
 }
