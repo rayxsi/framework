@@ -236,6 +236,8 @@ class Rayxsi extends Container {
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\EngineTreaties::class],
             'cache' => [\Artificers\Cache\CacheManager::class],
             'db' => [\Artificers\Database\DatabaseManager::class],
+            'db.schema'=>[\Artificers\Database\Lizie\Schema\Schema::class],
+            'db.builder'=>[\Artificers\Database\Lizie\Query\Builder::class],
             'router' => [\Artificers\Routing\Router::class],
             'request' => [\Artificers\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]

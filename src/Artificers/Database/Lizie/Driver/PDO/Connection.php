@@ -64,7 +64,7 @@ final class Connection implements ConnectionTreaties {
             $stmt = $this->connection->query($sql);
             assert($stmt instanceof PDOStatement);
 
-            return new Result($stmt);
+            return new Result($stmt, true);
         }catch(PDOException $e) {
             throw new DriverException($e->getMessage(), (int)$e->getCode());
         }

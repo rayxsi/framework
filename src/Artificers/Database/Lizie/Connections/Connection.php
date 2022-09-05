@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Artificers\Database\Lizie\Connections;
 
 use Artificers\Database\Lizie\Driver\Exception;
+use Artificers\Database\Lizie\Query\Builder as QueryBuilder;
 use Artificers\Database\Lizie\Schema\Grammars\Grammar;
 use Artificers\Database\Lizie\Query\Grammars\Grammar as QueryGrammar;
 use Artificers\Database\Lizie\Schema\Schema as SchemaBuilder;
@@ -323,6 +324,11 @@ class Connection {
      */
     public function getQueryGrammar(): QueryGrammar {
         return $this->queryGrammar;
+    }
+
+    public function getQueryBuilder(): QueryBuilder {
+
+        return new QueryBuilder($this);
     }
 
     /**

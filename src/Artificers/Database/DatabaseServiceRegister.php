@@ -19,6 +19,10 @@ class DatabaseServiceRegister extends ServiceRegister {
         $this->rXsiApp->bind('db.schema', function($rXsiApp) {
             return $rXsiApp['db']->connection()->getSchemaBuilder();
         });
+
+        $this->rXsiApp->bind('db.builder', function($rXsiApp) {
+            return $rXsiApp['db']->connection()->getQueryBuilder();
+        });
     }
 
     private function registerDB(): void {

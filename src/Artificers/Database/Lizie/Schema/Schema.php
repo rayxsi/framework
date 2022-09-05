@@ -66,10 +66,10 @@ class Schema {
      * @param string $table
      * @return bool
      * @throws Exception
-     * @throws \Artificers\Treaties\Database\Driver\Exception
+     * @throws \Exception
      */
     public function exists(string $table): bool {
-        $result = $this->connection->runQuery($this->grammar->compileTableExists(), [$this->connection->getSchema(), $table]);
+        $result = $this->connection->runQuery($this->grammar->burnTableExists(), [$this->connection->getSchema(), $table]);
         return count($result->fetchAllRowsAsNumeric()) > 0;
     }
 
@@ -80,7 +80,7 @@ class Schema {
      * @throws Exception
      */
     public function createDatabase(string $name): bool {
-        if($this->connection->runQuery($this->grammar->compileCreateDatabaseIfNotExists($name))) {
+        if($this->connection->runQuery($this->grammar->burnCreateDatabaseIfNotExists($name))) {
             return true;
         }
 
@@ -94,7 +94,7 @@ class Schema {
      * @throws Exception
      */
     public function use(string $database): bool {
-        if($this->connection->runQuery($this->grammar->compileUseDatabase($database))) {
+        if($this->connection->runQuery($this->grammar->burnUseDatabase($database))) {
             return true;
         }
 
@@ -108,7 +108,7 @@ class Schema {
      * @throws Exception
      */
     public function dropIfExists(): bool {
-        if($this->connection->runQuery($this->grammar->compileDropDatabaseIfExists($this->connection->getSchema()))) {
+        if($this->connection->runQuery($this->grammar->burnDropDatabaseIfExists($this->connection->getSchema()))) {
             return true;
         }
 
@@ -136,7 +136,7 @@ class Schema {
      * @throws Exception
      */
     public function rename(string $old, string $new): bool {
-        if($this->connection->runQuery($this->grammar->compileTableRename($old, $new))) return true;
+        if($this->connection->runQuery($this->grammar->burnTableRename($old, $new))) return true;
 
         return false;
     }
@@ -148,7 +148,7 @@ class Schema {
      * @throws Exception
      */
     public function enableForeignKeyConstraints(): bool {
-        if($this->connection->runQuery($this->grammar->compileEnableForeignKeyConstraints())) return  true;
+        if($this->connection->runQuery($this->grammar->burnEnableForeignKeyConstraints())) return  true;
         return false;
     }
 
@@ -159,7 +159,7 @@ class Schema {
      * @throws Exception
      */
     public function disableForeignKeyConstraints(): bool {
-        if($this->connection->runQuery($this->grammar->compileDisableForeignKeyConstraints())) return  true;
+        if($this->connection->runQuery($this->grammar->burnDisableForeignKeyConstraints())) return  true;
         return false;
     }
 
@@ -170,7 +170,7 @@ class Schema {
      */
     public function getAllTable(): array {
         try {
-            $this->connection->runQuery($this->grammar->compileGetAllTables());
+            $this->connection->runQuery($this->grammar->burnGetAllTables());
         }catch(Exception $e) {
             throw new LogicException("This database driver does not support getting all tables.");
         }

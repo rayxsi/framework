@@ -6,9 +6,6 @@ namespace Artificers\Database\Lizie;
 use Artificers\Database\Lizie\Connections\Connection;
 use Artificers\Database\Lizie\Exception\DriverRequiredException;
 use Artificers\Database\Lizie\Exception\UnknownDriverException;
-use Artificers\Database\Lizie\Schema\Grammars\MysqlGrammar;
-use Artificers\Database\Lizie\Schema\Grammars\PgsqlGrammar;
-use Artificers\Database\Lizie\Schema\Schema;
 
 class Manager {
     /**
@@ -25,8 +22,17 @@ class Manager {
      * @const DRIVER_MAPPER
      */
     private const SCHEMA_GRAMMAR_MAPPER = [
-        'mysql' => MysqlGrammar::class,
-        'pgsql' => PgsqlGrammar::class
+        'mysql' => Schema\Grammars\MysqlGrammar::class,
+        'pgsql' => Schema\Grammars\PgsqlGrammar::class
+    ];
+
+    /**
+     * Maps all the query grammar with key.
+     * @const DRIVER_MAPPER
+     */
+    private const QUERY_GRAMMAR_MAPPER = [
+        'mysql' => Query\Grammars\MysqlGrammar::class,
+        'pgsql' => Query\Grammars\MysqlGrammar::class
     ];
 
     /**
@@ -40,8 +46,7 @@ class Manager {
         //1. we have to make actual driver
         $driver = self::makeDriver($params);
         $connection = new Connection($params, $driver);
-        $connection->setSchemaGrammar(self::makeSchemaGrammar($params));
-        $connection->setSchema($params['name']);
+        $connection->setSchemaGrammar(self::makeSchemaGrammar($params))->setQueryGrammar(self::makeQueryGrammar($params))->setSchema($params['name']);
 
         return $connection;
     }
@@ -89,7 +94,31 @@ class Manager {
         throw new DriverRequiredException('Driver is required :(');
     }
 
-    public static function schema(Connection $connection): Schema {
-        return new Schema($connection);
+    /**
+     * Return the Schema instance.
+     *
+     * @param Connection $connection
+     * @return Schema\Schema
+     */
+    public static function schema(Connection $connection): Schema\Schema {
+        return new Schema\Schema($connection);
+    }
+
+    /**
+     * @throws DriverRequiredException
+     * @throws UnknownDriverException
+     */
+    private static function makeQueryGrammar(array $params): mixed {
+        if(isset($params['driver'])) {
+            if(!isset(self::DRIVER_MAPPER[$params['driver']])) {
+                throw new UnknownDriverException("Unknown driver is set to the connection params");
+            }
+
+            $queryGrammar = self::QUERY_GRAMMAR_MAPPER[$params['driver']];
+
+            return new $queryGrammar();
+        }
+
+        throw new DriverRequiredException('Driver is required :(');
     }
 }

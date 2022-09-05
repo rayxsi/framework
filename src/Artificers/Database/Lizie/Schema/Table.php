@@ -2,6 +2,7 @@
 
 namespace Artificers\Database\Lizie\Schema;
 
+use Artificers\Database\Lizie\Command;
 use Artificers\Database\Lizie\Connections\Connection;
 use Artificers\Database\Lizie\Driver\Exception;
 use Artificers\Database\Lizie\Schema\Grammars\Grammar;
@@ -83,7 +84,7 @@ class Table {
      */
     public function build(Connection $connection, Grammar $grammar): void {
         foreach($this->mapToSql($connection, $grammar) as $sql) {
-            $connection->runQuery($sql);
+            $connection->runQuery(trim($sql));
         }
     }
 
@@ -99,7 +100,7 @@ class Table {
         $statements = [];
 
         foreach($this->commands as $command) {
-            $method = "compile".ucfirst($command['name']);
+            $method = "burn".ucfirst($command['name']);
 
             if(method_exists($grammar, $method)) {
                 if(!is_null($sql = $grammar->$method($this, $connection, $command))) {

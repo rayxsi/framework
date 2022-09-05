@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Database\Lizie\Schema;
+namespace Artificers\Database\Lizie;
 
 use ArrayAccess;
 

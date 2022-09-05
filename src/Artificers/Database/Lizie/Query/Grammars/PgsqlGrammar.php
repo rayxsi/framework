@@ -2,7 +2,7 @@
 
 namespace Artificers\Database\Lizie\Query\Grammars;
 
-class PgsqlGrammar
+final class PgsqlGrammar extends Grammar
 {
 
 }

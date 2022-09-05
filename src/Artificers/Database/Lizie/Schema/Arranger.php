@@ -32,11 +32,11 @@ class Arranger {
      */
     public function arrange(): array {
         if(count($this->pkColumns) === 1) {
-            $this->pKeyClauses[] = $this->grammar->compilePrimaryKey($this->pkColumns);
+            $this->pKeyClauses[] = $this->grammar->burnPrimaryKey($this->pkColumns);
         }
 
         if(count($this->pkColumns) > 1) {
-            $this->pKeyClauses[] = $this->grammar->compilePrimaryKeyConstraint($this->table, $this->pkColumns);
+            $this->pKeyClauses[] = $this->grammar->burnPrimaryKeyConstraint($this->table, $this->pkColumns);
         }
 
         return Ary::merge($this->preparedColumns, $this->pKeyClauses, $this->fKeyClauses);
@@ -70,25 +70,25 @@ class Arranger {
             }
 
             if($column->isNullable()) {
-                $attributes .= " {$grammar->compileNullAble()}";
+                $attributes .= " {$grammar->burnNullAble()}";
             }else {
-                $attributes .= " {$grammar->compileNotNullAble()}";
+                $attributes .= " {$grammar->burnNotNullAble()}";
             }
 
             if($column->isAutoIncrement()) {
-                $attributes .= " {$grammar->compileAutoIncrement()}";
+                $attributes .= " {$grammar->burnAutoIncrement()}";
             }
 
             if($column->isUnique()) {
-                $attributes .= " {$grammar->compileUnique()}";
+                $attributes .= " {$grammar->burnUnique()}";
             }
 
             if(!empty($default = $column->getDefault())) {
-                $attributes .= " {$grammar->compileDefault($default)}";
+                $attributes .= " {$grammar->burnDefault($default)}";
             }
 
             if(!empty($condition = $column->getCheckable())) {
-                $attributes .= " {$grammar->compileCheck($condition)}";
+                $attributes .= " {$grammar->burnCheck($condition)}";
             }
 
             if($column->isPrimaryKey()) {
@@ -100,7 +100,7 @@ class Arranger {
                     throw new ForeignKeyException("Foreign key references is not set.");
                 }
 
-                $this->fKeyClauses[] = $grammar->compileForeignKey($this->table, $column);
+                $this->fKeyClauses[] = $grammar->burnForeignKey($this->table, $column);
             }
 
             $this->preparedColumns[] = $attributes;
