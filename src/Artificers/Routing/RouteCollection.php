@@ -80,11 +80,13 @@ class RouteCollection {
         $requestUri = urldecode($request->getRequestUri());
         $requestMethod = $request->getMethod();
 
-//        var_dump($requestUri, $requestMethod);
-//
-//        die();
-
+        //find the route with request method and request uri.
         $route = $this->getMatchedRoute($requestMethod, $requestUri);
+
+        //if route is null then find the route with name.
+        if(is_null($route)) {
+            $route = $this->getRouteByName(trim($requestUri, '/'));
+        }
 
         return $this->handleMatchedRoute($request, $route);
     }
