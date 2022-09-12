@@ -7,7 +7,7 @@ use Artificers\Container\Container;
 
 class DesignPatternFactory {
     private array $factory = [
-        "Pipeline" => Pattern\Pipeline::class
+        "Pipeline" => Patterns\Pipeline::class
     ];
 
     private Container $container;

@@ -245,9 +245,7 @@ class Router {
             return $this->prepareResponse($route);
         }
 
-        $this->matched($route);
-
-        $this->container['event.dispatcher']->dispatch(new RouteMatchedEvent($request, $route));
+        $this->dispatcher->dispatch(new RouteMatchedEvent($request, $route));
 
         $this->gatherMiddlewares();
 
@@ -288,12 +286,11 @@ class Router {
 
     /**
      * Set matched event.
-     *
-     * @param $route
+     * @param Closure|string $listener
      * @return void
      */
-    protected function matched($route): void {
-        $this->container['event.listener']->addEventListener('route.matched', $route->getProperties()['action'], $route->getProperties()['args']);
+    protected function matched(Closure|string $listener): void {
+        $this->listener->addEventListener(RouteMatchedEvent::class, $listener);
     }
 
     /**

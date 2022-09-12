@@ -1,9 +1,9 @@
 <?php
 
-namespace Artificers\Event;
+namespace Artificers\Events;
 
-use Artificers\Event\Dispatcher\EventDispatcher;
-use Artificers\Event\Listener\EventListenerProvider;
+use Artificers\Events\Dispatcher\EventDispatcher;
+use Artificers\Events\Listener\EventListenerProvider;
 use Artificers\Support\ServiceRegister;
 
 class EventServiceRegister extends ServiceRegister {

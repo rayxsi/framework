@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Event\Dispatcher;
+namespace Artificers\Events\Dispatcher;
 
 use Artificers\Container\Container;
 use Artificers\Treaties\Container\BindingException;

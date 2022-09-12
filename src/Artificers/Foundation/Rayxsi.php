@@ -1,17 +1,16 @@
 <?php
 declare(strict_types=1);
-
 namespace Artificers\Foundation;
 
 use Artificers\Container\Container;
-use Artificers\Event\EventServiceRegister;
+use Artificers\Events\EventServiceRegister;
 use Artificers\Foundation\Bootstrap\Environment;
 use Artificers\Foundation\Bootstrap\LoadConfigFiles;
 use Artificers\Foundation\Bootstrap\ServiceRegisters;
 use Artificers\Foundation\Config\Config;
 use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\EnvServiceRegister;
-use Artificers\Foundation\Event\BootEvent;
+use Artificers\Foundation\Events\BootEvent;
 use Artificers\Http\Request;
 use Artificers\Routing\RouteServiceRegister;
 use Artificers\Support\Illusion\Illusion;
@@ -229,9 +228,9 @@ class Rayxsi extends Container {
             'env' => [\Artificers\Foundation\Environment\Env::class],
             'error.handle' => [\Artificers\Foundation\Config\ErrorHandling::class],
             'config' => [\Artificers\Config\Repository::class],
-            'event' => [\Artificers\Event\Event::class, \Artificers\Treaties\Events\EventTreaties::class],
-            'event.dispatcher' => [\Artificers\Event\Dispatcher\EventDispatcher::class, \Artificers\Treaties\Events\EventDispatcherTreaties::class],
-            'event.listener' => [\Artificers\Event\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
+            'event' => [\Artificers\Events\Event::class, \Artificers\Treaties\Events\EventTreaties::class],
+            'event.dispatcher' => [\Artificers\Events\Dispatcher\EventDispatcher::class, \Artificers\Treaties\Events\EventDispatcherTreaties::class],
+            'event.listener' => [\Artificers\Events\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
             'view' => [\Artificers\View\Generator::class],
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\EngineTreaties::class],
             'cache' => [\Artificers\Cache\CacheManager::class],

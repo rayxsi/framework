@@ -1,8 +1,8 @@
 <?php
 
-namespace Artificers\Event\Listener;
+namespace Artificers\Events\Listener;
 
-use Artificers\Event\ListenerNotFoundException;
+use Artificers\Events\ListenerNotFoundException;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Utility\Ary;
 
@@ -23,11 +23,11 @@ class EventListenerProvider implements EventListenerProviderTreaties {
             return $this->eventMapToListeners[$nameSpaceTyped];
         }
 
-        if(!Ary::keyExists($type, $this->eventMapToListeners))
-            throw new ListenerNotFoundException("Listener not found for the following key {$type}");
+//        if(!Ary::keyExists($type, $this->eventMapToListeners))
+//            throw new ListenerNotFoundException("Listener not found for the following key {$type}");
 
 
-        return $this->eventMapToListeners[$type];
+        return $this->eventMapToListeners[$type] ?? [];
     }
 
     /**

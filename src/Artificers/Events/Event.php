@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Event;
+namespace Artificers\Events;
 
 use Artificers\Treaties\Events\EventTreaties;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Artificers\Foundation\Event;
+namespace Artificers\Foundation\Events;
 
-use Artificers\Event\Event;
+use Artificers\Events\Event;
 use Artificers\Foundation\Rayxsi;
 
 class BootEvent extends Event {

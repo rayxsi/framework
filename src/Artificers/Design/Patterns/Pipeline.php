@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Artificers\Design\Pattern;
+namespace Artificers\Design\Patterns;
 
 use Artificers\Container\Container;
 use Artificers\Design\Treaties\Pattern;
