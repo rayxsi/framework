@@ -77,7 +77,7 @@ class RouteCollection {
      */
     public function match(Request $request): ?Route {
         //1. We have to resolve request uri and method.
-        $requestUri = urldecode($request->getRequestUri());
+        $requestUri = $request->getRequestPath();
         $requestMethod = $request->getMethod();
 
         //find the route with request method and request uri.

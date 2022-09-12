@@ -3,7 +3,7 @@
 namespace Artificers\Routing;
 
 use Artificers\Container\Container;
-use Artificers\Supports\ServiceRegister;
+use Artificers\Support\ServiceRegister;
 
 class RouteServiceRegister extends ServiceRegister {
     public function register(): void {

@@ -3,6 +3,7 @@
 namespace Artificers\Routing;
 
 use Artificers\Container\Container;
+use Artificers\Utility\Ary;
 use Closure;
 
 class Route {
@@ -209,9 +210,8 @@ class Route {
      * @param array|string|null $middleware
      * @return $this
      */
-    public function middleware(array|string|null $middleware): static {
-        $this->properties['middleware'] = $middleware;
-
+    public function with(array|string|null $middleware): static {
+        $this->properties['middleware'] = is_array($middleware) ? $middleware : Ary::wrap($middleware);
         return $this;
     }
 

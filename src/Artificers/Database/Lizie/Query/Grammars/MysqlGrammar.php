@@ -4,7 +4,7 @@ namespace Artificers\Database\Lizie\Query\Grammars;
 
 use Artificers\Database\Lizie\Command;
 use Artificers\Database\Lizie\Connections\Connection;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 final class MysqlGrammar extends Grammar {
     /**

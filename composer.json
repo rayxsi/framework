@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "files": [
-            "src/Artificers/Supports/helpers.php"
+            "src/Artificers/Support/helpers.php"
         ],
         "psr-4": {
             "Artificers\\": "src/Artificers"

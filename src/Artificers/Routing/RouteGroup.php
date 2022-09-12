@@ -61,6 +61,6 @@ class RouteGroup {
     }
 
     private static function formatMiddleware(array $newProps, array $oldProps): array {
-        return array_merge($newProps['middleware'] ?? [], $oldProps['middleware'] ?? []);
+        return array_merge((array)($newProps['middleware'] ?? []), (array)($oldProps['middleware'] ?? []));
     }
 }

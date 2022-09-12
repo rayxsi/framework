@@ -3,6 +3,7 @@
 namespace Artificers\Database\Raintter;
 
 use Artificers\Database\Lizie\Connections\Connection;
+use Artificers\Database\Lizie\Query\Builder;
 use Artificers\Foundation\Rayxsi;
 
 class MDBConjunction {
@@ -12,13 +13,13 @@ class MDBConjunction {
       $this->connection = $rXsiApp['db']->connection();
     }
 
-    public function set(Model &$model): void {
-        $model->FirstName = "woo";
-    }
-
     public function transport(Model $model): bool {
 
 
         return false;
+    }
+
+    public function getQueryBuilder(): Builder {
+        return new Builder($this->connection);
     }
 }

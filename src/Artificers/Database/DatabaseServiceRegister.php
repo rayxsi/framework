@@ -2,7 +2,7 @@
 
 namespace Artificers\Database;
 
-use Artificers\Supports\ServiceRegister;
+use Artificers\Support\ServiceRegister;
 
 class DatabaseServiceRegister extends ServiceRegister {
     public function register(): void {

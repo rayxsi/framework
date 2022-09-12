@@ -2,7 +2,7 @@
 
 namespace Artificers\Database\Lizie\Query\Grammars;
 
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 abstract class Grammar {
 

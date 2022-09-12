@@ -4,21 +4,21 @@ declare(strict_types=1);
 namespace Artificers\Foundation;
 
 use Artificers\Container\Container;
-use Artificers\Events\EventServiceRegister;
+use Artificers\Event\EventServiceRegister;
 use Artificers\Foundation\Bootstrap\Environment;
 use Artificers\Foundation\Bootstrap\LoadConfigFiles;
 use Artificers\Foundation\Bootstrap\ServiceRegisters;
 use Artificers\Foundation\Config\Config;
 use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\EnvServiceRegister;
-use Artificers\Foundation\Events\BootEvent;
+use Artificers\Foundation\Event\BootEvent;
 use Artificers\Http\Request;
 use Artificers\Routing\RouteServiceRegister;
-use Artificers\Supports\Illusion\Illusion;
-use Artificers\Supports\ServiceRegister;
+use Artificers\Support\Illusion\Illusion;
+use Artificers\Support\ServiceRegister;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 
 class Rayxsi extends Container {
@@ -229,9 +229,9 @@ class Rayxsi extends Container {
             'env' => [\Artificers\Foundation\Environment\Env::class],
             'error.handle' => [\Artificers\Foundation\Config\ErrorHandling::class],
             'config' => [\Artificers\Config\Repository::class],
-            'event' => [\Artificers\Events\Event::class, \Artificers\Treaties\Events\EventTreaties::class],
-            'event.dispatcher' => [\Artificers\Events\Dispatcher\EventDispatcher::class, \Artificers\Treaties\Events\EventDispatcherTreaties::class],
-            'event.listener' => [\Artificers\Events\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
+            'event' => [\Artificers\Event\Event::class, \Artificers\Treaties\Events\EventTreaties::class],
+            'event.dispatcher' => [\Artificers\Event\Dispatcher\EventDispatcher::class, \Artificers\Treaties\Events\EventDispatcherTreaties::class],
+            'event.listener' => [\Artificers\Event\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
             'view' => [\Artificers\View\Generator::class],
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\EngineTreaties::class],
             'cache' => [\Artificers\Cache\CacheManager::class],
@@ -297,12 +297,12 @@ class Rayxsi extends Container {
             $identifier = $this->resolveServiceRegister($identifier);
         }
 
-        //4. call the boot method also
+        //3. call the boot method also
         if($this->isBooted()) {
             $identifier->boot();
         }
 
-        //3. now call the register method of service registers to register with rayxsi.
+        //4. now call the register method of service registers to register with rayxsi.
         $identifier->register();
 
         //5. at last set mark to this service register that is applied.

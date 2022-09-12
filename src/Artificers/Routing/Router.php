@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Artificers\Routing;
 
 use Artificers\Container\Container;
@@ -9,7 +8,7 @@ use Artificers\Http\Response;
 use Artificers\Routing\Events\RouteMatchedEvent;
 use Artificers\Treaties\Events\EventDispatcherTreaties;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 use Closure;
 
 class Router {
@@ -48,6 +47,9 @@ class Router {
      * @var array
      */
     public array $groupStackProps = [];
+
+    protected array $middlewares = [];
+    protected array $groupMiddlewares = [];
 
     public function __construct(Container $container = null) {
         $this->container = $container ?: new Container;
@@ -204,7 +206,7 @@ class Router {
      * @param Request $request
      * @return Response
      */
-    public function resolveWithRouter(Request $request): Response {
+    public function resolve(Request $request): Response {
         if(!$this->container->isResolved('view')) {
             $this->initializeView();
         }
@@ -247,6 +249,8 @@ class Router {
 
         $this->container['event.dispatcher']->dispatch(new RouteMatchedEvent($request, $route));
 
+        $this->gatherMiddlewares();
+
         return $this->prepareResponse($route);
     }
 
@@ -265,7 +269,6 @@ class Router {
             default => response($content, 200,  ["Content-Type" => "text/html"])
         };
     }
-
 
     /**
      * Get view content from cache.
@@ -389,6 +392,13 @@ class Router {
     public function hasGroupStackProps(): bool {
 
         return !empty($this->groupStackProps);
+    }
+
+    protected function gatherMiddlewares(): void {
+        $middleware = $this->container->make('middleware');
+
+        $this->middlewares = $middleware->get('route');
+        $this->groupMiddlewares = $middleware->get('group');
     }
 
     public function __call(string $name, array $arguments) {

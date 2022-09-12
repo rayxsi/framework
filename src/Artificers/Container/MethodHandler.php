@@ -2,10 +2,10 @@
 declare(strict_types=1);
 namespace Artificers\Container;
 
-use Artificers\Supports\Reflector;
+use Artificers\Support\Reflector;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 use Closure;
 use InvalidArgumentException;
 use ReflectionException;
@@ -65,6 +65,8 @@ class MethodHandler {
      * @throws BindingException
      */
     protected static function addDependencies(Container $container, ReflectionParameter $parameter, &$parameters, &$dependencies): void {
+        //if(!$parameter->isOptional()) dump($parameter->isOptional());
+
         //1. get the param name and check if it is there in parameters array or not.
         if(Ary::keyExists($name = $parameter->getName(), $parameters)) {
             $dependencies[] = $parameters[$name];

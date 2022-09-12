@@ -4,7 +4,7 @@ namespace Artificers\Database\Lizie\Schema;
 
 use Artificers\Database\Lizie\Schema\Exceptions\ForeignKeyException;
 use Artificers\Database\Lizie\Schema\Grammars\Grammar;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 class Arranger {
     private array $preparedColumns;

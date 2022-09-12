@@ -2,7 +2,7 @@
 
 namespace Artificers\Foundation\Environment;
 
-use Artificers\Supports\ServiceRegister;
+use Artificers\Support\ServiceRegister;
 
 class EnvServiceRegister extends ServiceRegister {
     public function register(): void {

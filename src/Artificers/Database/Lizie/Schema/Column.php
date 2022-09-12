@@ -2,7 +2,7 @@
 
 namespace Artificers\Database\Lizie\Schema;
 
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 class Column {
     private string $name;

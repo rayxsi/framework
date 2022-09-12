@@ -1,7 +1,7 @@
 <?php
 namespace Artificers\Config;
 
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 class Repository {
 

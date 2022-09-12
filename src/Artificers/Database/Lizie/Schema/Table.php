@@ -6,7 +6,7 @@ use Artificers\Database\Lizie\Command;
 use Artificers\Database\Lizie\Connections\Connection;
 use Artificers\Database\Lizie\Driver\Exception;
 use Artificers\Database\Lizie\Schema\Grammars\Grammar;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 class Table {
 

@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
-
 namespace Artificers\Foundation\Http;
 
 use Artificers\Foundation\Rayxsi;
 use Artificers\Http\Request;
 use Artificers\Http\Response;
 use Artificers\Routing\Router;
+use Artificers\Support\Illusion\Route;
 use Artificers\Treaties\Http\HttpKernelTreaties;
-use Artificers\View\ViewServiceRegister;
+use Closure;
+use Throwable;
 
 class Kernel implements HttpKernelTreaties {
     protected Rayxsi $rXsiApp;
@@ -20,12 +21,39 @@ class Kernel implements HttpKernelTreaties {
     }
 
     public function resolve(Request $request): Response {
-        //set the current request to the container so that we can use it until the response back.
+        try {
+            $response = $this->pushRequestThroughRouter($request);
+        }catch(Throwable $e) {
+            $response = $this->renderException($request, $e);
+        }
+
+        return $response;
+    }
+
+    protected function pushRequestThroughRouter(Request $request): Response {
+        //Set the current request to the container so that we can use it until the response is going back.
         $this->rXsiApp->setInstance('request', $request);
+        Route::removeCachedInstance('request');
 
-        //here we need to explicitly bind the server info to the front end.
-        $this->rXsiApp['view']->compiler->bindServer($this->rXsiApp['request']->getSerializedServerInfo());
+        return $this->rXsiApp['dp']->get('Pipeline')->send($request)
+            ->through($this->resolveWithGlobalMiddleware())
+            ->next($this->dispatchToRouter());
+    }
 
-        return $this->router->resolveWithRouter($request);
+    protected function dispatchToRouter(): Closure{
+        return function($request) {
+            //Here we need to explicitly bind the server info to the front-end engine.
+            $this->rXsiApp['view']->compiler->bindServer($request->getSerializedServerInfo());
+
+            return $this->router->resolve($request);
+        };
+    }
+
+    protected function resolveWithGlobalMiddleware(): array {
+        return $this->rXsiApp['middleware']->get('global');
+    }
+
+    protected function resolveWithGroupMiddleware(): array {
+        return $this->rXsiApp['middleware']->get('group');
     }
 }

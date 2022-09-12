@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace Artificers\Container;
 
 use ArrayAccess;
-use Artificers\Supports\Illusion\RXsiApp;
-use Artificers\Supports\Reflector;
+use Artificers\Support\Illusion\RXsiApp;
+use Artificers\Support\Reflector;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\ContainerTreaties;
 use Artificers\Treaties\Container\NotFoundException;

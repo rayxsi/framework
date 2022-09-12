@@ -2,7 +2,7 @@
 
 namespace Artificers\Cache;
 
-use Artificers\Supports\ServiceRegister;
+use Artificers\Support\ServiceRegister;
 
 class CacheServiceRegister extends ServiceRegister {
     public function register(): void {

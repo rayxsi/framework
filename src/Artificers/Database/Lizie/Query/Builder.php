@@ -4,9 +4,10 @@ namespace Artificers\Database\Lizie\Query;
 
 use Artificers\Database\Lizie\Command;
 use Artificers\Database\Lizie\Connections\Connection;
+use Artificers\Database\Lizie\Connections\Result;
 use Artificers\Database\Lizie\Driver\Exception;
 use Artificers\Database\Lizie\Query\Grammars\Grammar;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 use LogicException;
 
 class Builder {
@@ -24,13 +25,13 @@ class Builder {
 
     /**
      * Execute the sql command.
-     * @throws Exception
+     * @return bool|Result
      */
-    public function run(): bool|array|string {
-        $outcome = $this->_build(1);
+    public function run(): bool|Result {
+        $result = $this->_build(1);
         $this->flushPv();
 
-        return $outcome;
+        return $result;
     }
 
     /**
@@ -131,18 +132,24 @@ class Builder {
 
     /**
      * Build the sql and execute it.
-     * @throws Exception
-     * @throws \Exception
+     * @param int $executionFlag
+     * @return bool|Result|string
      */
-    protected function _build(int $executionFlag=0): bool|array|string {
-       $sql = $this->mapToSql();
+    protected function _build(int $executionFlag=0): bool|Result|string {
+       $sql = $this->_mapToSql();
        if($executionFlag === 0) return $sql;
+       $result = null;
 
-       $result = $this->connection->runQuery(trim($sql), $this->placeHolderValues);
+        try {
+            $this->connection->startTransaction();
+            $result = $this->connection->runQuery(trim($sql), $this->placeHolderValues);
+        } catch (Exception $e) {
+            $this->connection->rollback();
+        }
 
         return match ($this->command['name']) {
             'update', "delete", 'insert', 'insertWithCpy' => $result->getExecStatus(),
-            default => $result->fetchAllRowsAsObject(),
+            default => $result,
         };
     }
 
@@ -150,7 +157,7 @@ class Builder {
      * Map to sql according to command name.
      * @return string
      */
-    protected function mapToSql(): string {
+    protected function _mapToSql(): string {
         if(!is_null($this->command)) {
             $method = "burn".ucfirst($this->command['name']);
 

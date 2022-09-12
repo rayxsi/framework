@@ -2,7 +2,7 @@
 
 namespace Artificers\Database\Concern;
 
-use Artificers\Supports\Concern\Regex;
+use Artificers\Support\Concern\Regex;
 
 trait InteractWithInputValidation {
     use Regex;

@@ -27,15 +27,14 @@ class ErrorHandling {
      * @return void
      * @throws ErrorException
      */
-
     public static function exceptionHandling($exception): void {
         $code = $exception->getCode() !== 404 ? 500 : $exception->getCode();
         http_response_code($code);
 
         if((bool)$_ENV['DEBUG_MODE'] === true) {
-            echo "<h1>Fatal Error: </h1>";
+            echo "<h1 style='color: red;'>Fatal Error: </h1>";
             echo "<p>Uncaught exception: " . get_class($exception) . "</p>";
-            echo "<p>Message: " . $exception->getMessage() . "</p>";
+            echo "<p style='color: #323539'>Message: " . $exception->getMessage() . "</p>";
             echo "<p>Stack trace: " . $exception->getTraceAsString() . "</p>";
             echo "<p>Thrown in " . $exception->getFile() . " in line " . $exception->getLine() . "</p>";
         }else {

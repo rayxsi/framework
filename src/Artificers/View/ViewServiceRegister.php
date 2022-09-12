@@ -2,7 +2,7 @@
 
 namespace Artificers\View;
 
-use Artificers\Supports\ServiceRegister;
+use Artificers\Support\ServiceRegister;
 use Artificers\View\Engines\Croxo;
 
 class ViewServiceRegister extends ServiceRegister {

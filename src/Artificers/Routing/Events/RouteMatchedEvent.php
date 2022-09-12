@@ -2,7 +2,7 @@
 
 namespace Artificers\Routing\Events;
 
-use Artificers\Events\Event;
+use Artificers\Event\Event;
 use Artificers\Http\Request;
 use Artificers\Routing\Route;
 

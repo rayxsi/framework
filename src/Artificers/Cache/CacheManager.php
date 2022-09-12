@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Artificers\Cache;
 
 use Artificers\Container\Container;
-use Artificers\Utilities\Ary;
+use Artificers\Utility\Ary;
 
 class CacheManager {
     private array $storage = [];

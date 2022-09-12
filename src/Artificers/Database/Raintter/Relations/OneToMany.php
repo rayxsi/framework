@@ -2,7 +2,6 @@
 
 namespace Artificers\Database\Raintter\Relations;
 
-class OneToMany
-{
+class OneToMany {
 
 }
