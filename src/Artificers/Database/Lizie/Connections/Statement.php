@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Artificers\Database\Lizie\Connections;
 
+use Artificers\Database\Lizie\Driver\Exception;
 use Artificers\Database\Lizie\Type;
 use Artificers\Treaties\Database\Driver\Exception as DriverException;
 use Artificers\Treaties\Database\PDO\Statement as DriverStatement;
-use Exception;
 
 class Statement {
     protected Connection $_conn;
@@ -31,7 +31,7 @@ class Statement {
      * @param mixed $value
      * @param int $type
      * @return bool
-     * @throws Exception
+     * @throws DriverException
      */
     public function bindValue(int|string $param, mixed $value, int $type=Type::PARAM_STR): bool {
         $this->params[$param] = $value;
@@ -76,7 +76,7 @@ class Statement {
      * @param int $maxLength
      * @param mixed|null $driverOptions
      * @return bool
-     * @throws Exception
+     * @throws DriverException
      */
     public function bindColumn(string|int $column, mixed &$var, int $type = Type::PARAM_STR, int $maxLength = 0, mixed $driverOptions = null): bool {
         $this->columns[$column] = $var;
@@ -96,7 +96,7 @@ class Statement {
      * Executes a prepared statement.
      * @param mixed $params
      * @return Result
-     * @throws Exception
+     * @throws DriverException
      */
     public function run(mixed $params = null): Result {
         try{

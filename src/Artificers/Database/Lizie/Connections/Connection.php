@@ -14,7 +14,6 @@ use Artificers\Treaties\Database\Driver\Driver;
 use Artificers\Treaties\Database\Driver\Exception as DriverException;
 use Artificers\Treaties\Database\PDO\Connection as DriverConnection;
 
-
 class Connection {
     protected Driver $_driver;
 
@@ -94,7 +93,7 @@ class Connection {
      * @param bool $forceToCache
      * @param string|null $cacheAlias
      * @return Result
-     * @throws Exception
+     * @throws DriverException
      */
     public function runQuery(string $sql, array $params = [], bool $forceToCache = false, ?string $cacheAlias = null): Result {
         $connection = $this->getConnection();
@@ -123,7 +122,7 @@ class Connection {
      * @param string $cacheAlias
      * @param array $params
      * @return Result
-     * @throws Exception
+     * @throws DriverException
      */
     public function runCachedQuery(string $cacheAlias, array $params = []): Result {
         if(isset($this->cachedSql[$cacheAlias])) {
@@ -164,7 +163,7 @@ class Connection {
     /**
      * Start the database transaction.
      *
-     * @throws Exception
+     * @throws DriverException
      */
     public function startTransaction(): bool {
         $connection = $this->getConnection();
@@ -191,7 +190,7 @@ class Connection {
     /**
      * Save the transaction.
      *
-     * @throws Exception
+     * @throws DriverException
      */
     public function commit(): bool {
         $this->transactionLevel--;
@@ -218,7 +217,7 @@ class Connection {
     /**
      * Revert the transaction.
      *
-     * @throws Exception
+     * @throws DriverException
      */
     public function rollback(): bool {
         $this->transactionLevel--;
@@ -256,7 +255,7 @@ class Connection {
      *
      * @param string|null $name
      * @return string|false
-     * @throws Exception
+     * @throws DriverException
      */
     public function lastInsertedId(?string $name = null): string|false {
         try {
