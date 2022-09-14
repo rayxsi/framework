@@ -55,3 +55,14 @@ if(!function_exists("auto")) {
     }
 }
 
+if(!function_exists('view')) {
+
+    /**
+     * Generate view.
+     * @return \Artificers\View\View
+     */
+    function view(): \Artificers\View\View{
+        return View::generate();
+    }
+}
+
