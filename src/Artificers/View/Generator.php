@@ -4,8 +4,10 @@ namespace Artificers\View;
 
 use Artificers\Cache\ViewCache;
 use Artificers\Container\Container;
+use Artificers\Support\JSON;
 use Artificers\Treaties\View\CompilerTreaties;
 use Artificers\Treaties\View\EngineTreaties;
+use Symfony\Component\Finder\Finder;
 
 class Generator {
     protected Container $container;
@@ -16,17 +18,13 @@ class Generator {
         $this->container = $container ?: new Container();
         $this->engine = $engine;
         $this->compiler = $compiler;
-
-        $viewCache = $this->container['cache']->get('view') ?? new ViewCache();
-        $this->container['cache']->set('view', $viewCache);
     }
 
     /**
      * Generate the view.
-     *
-     * @return void
+     * @return View
      */
-    public function generate(): void {
+    public function generate(): View {
         //1. Compile the server side js file.
         $jsonOfViewWithState = $this->compiler->compile($this->container['path.ssr'].DIRECTORY_SEPARATOR.'server.js');
 
@@ -34,22 +32,16 @@ class Generator {
         $layoutMarkup = file_get_contents($this->container['path.view'].DIRECTORY_SEPARATOR.'main.croxo.php');
 
         //Decode the json of view.
-        $ui = json_decode($jsonOfViewWithState);
+        $ui = JSON::parse($jsonOfViewWithState);
 
         //Generate script tag with state.
         $layoutMarkupWithState = $this->handleUiState($layoutMarkup, $ui);
 
-        $viewCache = $this->container['cache']->get('view');
-
-        $viewCache->set($this->injectUiMarkup($layoutMarkupWithState, $ui));
-//
-//        $this->container['cache']->set('view', $this->viewCache);
+        return new View($this->injectUiMarkup($layoutMarkupWithState, $ui));
     }
-
 
     /**
      * Generate script tag with state,
-     *
      * @param string $layoutMarkup
      * @param object $ui
      * @return string
@@ -66,7 +58,6 @@ class Generator {
 
     /**
      * Inject ui markup in main layout.
-     *
      * @param string $layoutMarkup
      * @param object $ui
      * @return string
