@@ -138,7 +138,7 @@ class Pipeline implements Pattern {
      * @return mixed
      */
     public function next(Closure $next): mixed {
-        $pipeline = array_reduce($this->pipesStack, $this->processOnion(), $this->processFinalDestination($next));
+        $pipeline = array_reduce(array_reverse($this->pipesStack), $this->processOnion(), $this->processFinalDestination($next));
         return $pipeline($this->argument);
     }
 
