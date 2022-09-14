@@ -1,10 +1,9 @@
 <?php
-
-namespace Artificers\Support\Illusion;
+declare(strict_types=1);
+namespace Artificers\Design\Patterns;
 
 use Artificers\Foundation\Rayxsi;
 use RuntimeException;
-
 
 abstract class Illusion {
     protected static Rayxsi $rXsiApp;
