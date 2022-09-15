@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Artificers\Database\Lizie\Connections;
 
-use Artificers\Database\Lizie\Driver\Exception;
+use Artificers\Database\Lizie\Exception\LizieException;
 use Artificers\Database\Lizie\Type;
 use Artificers\Treaties\Database\Driver\Exception as DriverException;
 use Artificers\Treaties\Database\PDO\Statement as DriverStatement;
@@ -40,7 +40,7 @@ class Statement {
         try {
             return $this->_stmt->bindValue($param, $value, $type);
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
     }
 
@@ -52,7 +52,7 @@ class Statement {
      * @param int $maxLength
      * @param mixed|null $driverOptions
      * @return bool
-     * @throws Exception
+     * @throws DriverException
      */
     public function bindParam(int|string $param, mixed &$var, int $type = Type::PARAM_STR, int $maxLength = 0, mixed $driverOptions = null): bool {
         $this->params[$param] = $var;
@@ -64,7 +64,7 @@ class Statement {
             }
             return $this->_stmt->bindParam($param, $var, $type);
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
     }
 
@@ -88,7 +88,7 @@ class Statement {
             }
             return $this->_stmt->bindParam($column, $var, $type);
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
     }
 
@@ -102,7 +102,7 @@ class Statement {
         try{
             return new Result($this->_stmt->execute($params), $this->_conn);
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
     }
 }

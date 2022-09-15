@@ -2,17 +2,18 @@
 
 namespace Artificers\Treaties\Database;
 
-use Exception;
+
+use Artificers\Treaties\Database\Driver\Exception;
 
 interface Result {
     /**
      * Fetches the next row from a result set as both.
      *
-     * @return mixed
+     * @return array
      *
      * @throws Exception
      */
-    public function fetchNextRow(): mixed;
+    public function fetchNextRow(): array;
 
     /**
      * Returns an array indexed by column name as returned in your result set.

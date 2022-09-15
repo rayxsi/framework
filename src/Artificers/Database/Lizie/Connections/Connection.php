@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Artificers\Database\Lizie\Connections;
 
-use Artificers\Database\Lizie\Driver\Exception;
+use Artificers\Database\Lizie\Exception\LizieException;
 use Artificers\Database\Lizie\Query\Builder as QueryBuilder;
 use Artificers\Database\Lizie\Schema\Grammars\Grammar;
 use Artificers\Database\Lizie\Query\Grammars\Grammar as QueryGrammar;
@@ -62,7 +62,7 @@ class Connection {
         try {
             $stmt = $connection->prepare($sql);
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
 
         return new Statement($this, $stmt, $sql);
@@ -110,7 +110,7 @@ class Connection {
                 $result = $connection->query($sql);
             }
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
 
         return new Result($result, $this);
@@ -138,13 +138,13 @@ class Connection {
                     $result = $connection->query($sql);
                 }
             }catch(DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
 
             return new Result($result, $this);
         }
 
-        throw new Exception('Undefined cache alias.');
+        throw new LizieException('Undefined cache alias.');
     }
 
     /**
@@ -172,13 +172,13 @@ class Connection {
             try {
                return $connection->startTransaction();
             }catch(DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
         }else {
             try {
                 $connection->exec("SAVEPOINT {$this->_generateSavePointMarker()}");
             }catch(DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
         }
 
@@ -201,13 +201,13 @@ class Connection {
             try {
                 $result = $connection->commit();
             }catch(DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
         }else {
             try {
                 $connection->exec("RELEASE SAVEPOINT {$this->_generateSavePointMarker()}");
             }catch(DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
         }
 
@@ -228,13 +228,13 @@ class Connection {
             try {
                 $result = $connection->rollback();
             }catch(DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
         }else {
             try {
                 $connection->exec("ROLLBACK TO SAVEPOINT {$this->_generateSavePointMarker()}");
             } catch (DriverException $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
+                throw new LizieException($e->getMessage(), $e->getCode());
             }
         }
 
@@ -261,7 +261,7 @@ class Connection {
         try {
             return $this->getConnection()->lastInsertedId($name);
         }catch(DriverException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new LizieException($e->getMessage(), $e->getCode());
         }
     }
 

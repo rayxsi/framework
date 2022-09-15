@@ -28,7 +28,7 @@ final class Result implements ResultTreaties {
      * @inheritDoc
      * @throws Exception
      */
-    public function fetchNextRow(): mixed {
+    public function fetchNextRow(): array {
         return $this->fetch(PDO::FETCH_BOTH);
     }
 
