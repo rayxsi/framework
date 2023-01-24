@@ -33,6 +33,12 @@ if(!function_exists('full_path')) {
     }
 }
 
+if(!function_exists('tmp_path')) {
+    function tmp_path(string $path): string {
+        return RXsiApp::getTmpPath().DIRECTORY_SEPARATOR.$path;
+    }
+}
+
 if(!function_exists('rXsiApp')) {
     function rXsiApp(): Container {
         return Container::makeInstance();
@@ -52,6 +58,19 @@ if(!function_exists("auto")) {
         $callback($value);
 
         return $value;
+    }
+}
+
+if(!function_exists('invokeWith')) {
+
+    /**
+     * Invoke a callback with given value.
+     * @param mixed $with
+     * @param Closure $callback
+     * @return void
+     */
+    function invokeWith(mixed $with, Closure $callback): void {
+        $callback($with);
     }
 }
 
