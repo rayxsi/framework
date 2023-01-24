@@ -1,17 +1,21 @@
 <?php
 declare(strict_types=1);
-
 namespace Artificers\Http;
 
-use Artificers\Http\Concern\AboutContentTypes;
-use Artificers\Http\Concern\AboutInputs;
 use Artificers\Support\Concern\Regex;
+use Artificers\Support\JSON;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+/**
+ * Request class handle all about http request. It extends Symfony\Component\HttpFoundation\Request base class.
+ *
+ *
+ * @author Topu <toerso.mechanix@gmail.com>
+ */
 class Request extends SymfonyRequest{
-    use Regex, AboutContentTypes, AboutInputs;
+    use Regex, Concern\AboutContentTypes, Concern\AboutInputs;
 
     /**
      * The decoded JSON content for the request.
@@ -20,11 +24,19 @@ class Request extends SymfonyRequest{
      */
     protected ?ParameterBag $json;
 
-   public static function snap(): Request {
+    /**
+     * Take a snap of current request.
+     * @return Request The current Request instance.
+     */
+    public static function snap(): Request {
        return parent::createFromGlobals();
    }
 
-   public function getSerializedServerInfo(): array {
+    /**
+     * Get serialized server information.
+     * @return array    An array of server information.
+     */
+    public function getSerializedServerInfo(): array {
         $server = [];
 
         $server["SERVER_PORT"] = $this->getPort();
@@ -35,22 +47,26 @@ class Request extends SymfonyRequest{
         return $server;
    }
 
-   public function root(): string {
+    /**
+     * Get the http host.
+     * @return string   Http host.
+     */
+    public function root(): string {
        return rtrim($this->getSchemeAndHttpHost(), '/');
    }
 
     /**
      * Get the URL for the request without query string.
      *
-     * @return string
+     * @return string   Requested URL without query string.
      */
     public function url(): string {
-        return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
+        return rtrim($this->replace('/\?.*/', '', $this->getUri()), '/');
     }
 
     /**
      * Get the request uri without query string.
-     * @return string
+     * @return string   Requested uri without query string.
      */
     public function getRequestPath(): string {
         if(preg_match("/(.*)(?=\?)/", $this->getRequestUri(), $matches)) {
@@ -63,7 +79,7 @@ class Request extends SymfonyRequest{
     /**
      * Get the current path info for the request.
      *
-     * @return string
+     * @return string   The current path.
      */
     public function path(): string {
         $pattern = trim($this->getPathInfo(), '/');
@@ -74,7 +90,7 @@ class Request extends SymfonyRequest{
     /**
      * Determine if the request is the result of an AJAX call.
      *
-     * @return bool
+     * @return bool  True or false.
      */
     public function isAjax(): bool{
         return $this->isXmlHttpRequest();
@@ -83,7 +99,7 @@ class Request extends SymfonyRequest{
     /**
      * Determine if the request is the result of a PJAX call.
      *
-     * @return bool
+     * @return bool True or false.
      */
     public function isPjax(): bool{
         return $this->headers->get('X-PJAX') == true;
@@ -92,7 +108,7 @@ class Request extends SymfonyRequest{
     /**
      * Get the client IP address.
      *
-     * @return string|null
+     * @return string|null  Client IP address.
      */
     public function ip(): ?string {
         return $this->getClientIp();
@@ -101,7 +117,7 @@ class Request extends SymfonyRequest{
     /**
      * Get the client IP addresses.
      *
-     * @return array
+     * @return array    An array of client IP addresses.
      */
     public function ips(): array {
         return $this->getClientIps();
@@ -110,7 +126,7 @@ class Request extends SymfonyRequest{
     /**
      * Determine if the request is over HTTPS.
      *
-     * @return bool
+     * @return bool True or false.
      */
     public function secure(): bool {
         return $this->isSecure();
@@ -119,29 +135,47 @@ class Request extends SymfonyRequest{
     /**
      * Get the client user agent.
      *
-     * @return string|null
+     * @return string|null User-agent/browser name and version.
      */
     public function userAgent(): ?string {
         return $this->headers->get('User-Agent');
     }
 
+    /**
+     * Convert json data to key->value pair into parameter bag and return ParameterBag instance.
+     * @return ParameterBag|null \Symfony\Component\HttpFoundation\ParameterBag instance or null.
+     */
     protected function jsonAble(): ?ParameterBag {
         if(!isset($this->json)) {
-            $this->json = new ParameterBag((array)json_decode($this->getContent(), true));
+            $this->json = new ParameterBag((array)JSON::parse($this->getContent(), true));
         }
 
         return $this->json;
     }
 
-   public function payload(): array {
+    /**
+     * Get the requested json payload as an array.
+     * @return array An array of requested payload.
+     */
+    public function payload(): array {
        return $this->jsonAble()->all();
    }
 
-   public function field(string $key, mixed $default = null): mixed {
-       return $this->jsonAble()->get($key, $default);
+    /**
+     * Retrieve a value of a key from the requested json payload/content.
+     * @param string        $name       Input field name.
+     * @param mixed|null    $default    Default value of that field.
+     * @return mixed       Input field value.
+     */
+    public function field(string $name, mixed $default = null): mixed {
+       return $this->jsonAble()->get($name, $default);
    }
 
-   public function inputSource(): ParameterBag|InputBag|null {
+    /**
+     * Return the correct input source based on request.
+     * @return ParameterBag|InputBag|null \Symfony\Component\HttpFoundation\ParameterBag instance or null.
+     */
+    public function inputSource(): ParameterBag|InputBag|null {
         if($this->isJson()) {
             return $this->jsonAble();
         }

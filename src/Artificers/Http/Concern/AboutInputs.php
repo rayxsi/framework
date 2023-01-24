@@ -3,15 +3,19 @@ declare(strict_types=1);
 
 namespace Artificers\Http\Concern;
 
-use Symfony\Component\HttpFoundation\InputBag;
-
+/**
+ * AboutInputs concern about the request's inputs.
+ *
+ *
+ * @author Topu <toerso.mechanix@gmail.com>
+ */
 trait AboutInputs {
     /**
      * Retrieve item from desired bag.
-     * @param string $source
-     * @param string $key
-     * @param string|null $default
-     * @return mixed
+     * @param string        $source     Source name.
+     * @param string        $key        Key that value has to retrieve.
+     * @param string|null   $default    Default value of this key.
+     * @return mixed                    All if key is not set. Otherwise, returns the value of that key. If key doesn't exist then return the default value.
      */
     public function retrieveItemFrom(string $source, string $key, string $default = null): mixed {
         if(empty($key)) {
@@ -23,9 +27,9 @@ trait AboutInputs {
 
     /**
      * Get desired header from the headers.
-     * @param string $key
-     * @param string|null $default
-     * @return mixed
+     * @param string        $key        Header key that has to retrieve.
+     * @param string|null   $default    Default value of this key.
+     * @return mixed                    All if key is not set. Otherwise, returns the value of that key. If key doesn't exist then return the default value.
      */
     public function header(string $key, string $default = null): mixed {
         return $this->retrieveItemFrom("headers", $key, $default);
@@ -33,9 +37,9 @@ trait AboutInputs {
 
     /**
      * Get the desired server info from the server.
-     * @param string $key
-     * @param string|null $default
-     * @return mixed
+     * @param string        $key        Server key that has to retrieve.
+     * @param string|null   $default    Default value of this key.
+     * @return mixed                    All if key is not set. Otherwise, returns the value of that key. If key doesn't exist then return the default value.
      */
     public function server(string $key, string $default = null): mixed {
         return $this->retrieveItemFrom('server', $key, $default);
