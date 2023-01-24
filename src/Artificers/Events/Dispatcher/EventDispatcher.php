@@ -71,7 +71,6 @@ class EventDispatcher implements EventDispatcherTreaties {
         return null;
     }
 
-
     /**
      * @throws ReflectionException
      * @throws NotFoundException
