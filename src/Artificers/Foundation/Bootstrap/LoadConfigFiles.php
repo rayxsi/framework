@@ -17,9 +17,9 @@ class LoadConfigFiles implements BootstrapListenerTreaties {
      */
     public function load($event): void {
         //Create config repository instance
-        $event->rXsiApp->setInstance('config', $repo = new Repository());
+        $event->getRayxsi()->setInstance('config', $repo = new Repository());
 
-        $this->loadConfigFiles($event->rXsiApp, $repo);
+        $this->loadConfigFiles($event->getRayxsi(), $repo);
     }
 
     /**
