@@ -18,6 +18,7 @@ class Env {
      * @return mixed
      */
     public function collect(string $key): mixed {
+        $key = strtoupper($key);
         return empty($_ENV[$key]) ? null : $_ENV[$key];
     }
 }
