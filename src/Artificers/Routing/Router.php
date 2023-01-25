@@ -1,24 +1,31 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Artificers\Routing;
 
 use Artificers\Container\Container;
 use Artificers\Http\Request;
-use Artificers\Http\Response;
 use Artificers\Routing\Events\RouteMatchedEvent;
+use Artificers\Routing\Events\RoutingEvent;
+use Artificers\Support\Concern\AboutResponse;
 use Artificers\Treaties\Events\EventDispatcherTreaties;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Utility\Ary;
 use Closure;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/**
+ * Router class handle all about routing and prepare the response and send back to the http kernel.
+ *
+ *
+ * @author Topu <toerso.mechanix@gmail.com>
+ */
 class Router {
+    use AboutResponse;
     /**
      * Container.
      *
      * @var Container
      */
     private Container $container;
-
 
     /**
      * Route collection.
@@ -51,6 +58,8 @@ class Router {
     protected array $middlewares = [];
     protected array $groupMiddlewares = [];
 
+    protected Route $currentRoute;
+
     public function __construct(Container $container = null) {
         $this->container = $container ?: new Container;
         $this->routes = new RouteCollection;
@@ -61,9 +70,9 @@ class Router {
 
     /**
      * Create route with get method.
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                    $uri        Set a URI to route.
+     * @param callable|string|array     $action     Action handler for this route.
+     * @return Route    Route instance.
      */
     public function get(string $uri, callable|string|array $action): Route {
         return $this->addRoute('GET', $uri, $action);
@@ -71,9 +80,9 @@ class Router {
 
     /**
      * Create route with post method.
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                    $uri        Set a URI to route.
+     * @param callable|string|array     $action     Action handler for this route.
+     * @return Route    Route instance.
      */
     public function post(string $uri, callable|string|array $action): Route {
         return $this->addRoute('POST', $uri, $action);
@@ -82,9 +91,9 @@ class Router {
     /**
      * Create route with put method.
      *
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                    $uri        Set a URI to route.
+     * @param callable|string|array     $action     Action handler for this route.
+     * @return Route    Route instance.
      */
     public function put(string $uri, callable|string|array $action): Route {
       return $this->addRoute('PUT', $uri, $action);
@@ -93,9 +102,9 @@ class Router {
     /**
      * Create route with delete method.
      *
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                    $uri        Set a URI to route.
+     * @param callable|string|array     $action     Action handler for this route.
+     * @return Route    Route instance.
      */
     public function delete(string $uri, callable|string|array $action): Route {
        return $this->addRoute('DELETE', $uri, $action);
@@ -104,8 +113,8 @@ class Router {
     /**
      * Fallback Route.
      *
-     * @param callable $action
-     * @return Route
+     * @param callable $action  Action handler for fallback route.
+     * @return Route    Route instance.
      */
     public function fallback(callable $action): Route {
         $placeholder = "fallback";
@@ -116,10 +125,10 @@ class Router {
     /**
      * Add route to route collection.
      *
-     * @param string $method
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                $method    Http method.
+     * @param string                $uri       URI
+     * @param callable|string|array $action    Action handler for this route
+     * @return Route Route instance.
      */
     protected function addRoute(string $method, string $uri, callable|string|array $action): Route {
         return $this->routes->add($this->createRoute($method, $uri, $action));
@@ -128,10 +137,10 @@ class Router {
     /**
      * Create Route.
      *
-     * @param string $method
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                $method    Http method.
+     * @param string                $uri       URI
+     * @param callable|string|array $action    Action handler for this route
+     * @return Route Route instance.
      */
     protected function createRoute(string $method, string $uri, callable|string|array $action): Route {
         if(Ary::isArr($action)) {
@@ -150,8 +159,8 @@ class Router {
     /**
      * Concat controller with action handler.
      *
-     * @param array $action
-     * @return string
+     * @param array $action     Array of action and handler that will concatenate with @ sign.
+     * @return string           Concatenated string with @.
      */
     protected function concatActionWithHandler(array $action): string {
         return $action[0].'@'.$action[1];
@@ -160,10 +169,10 @@ class Router {
     /**
      * Generate new Route.
      *
-     * @param string $method
-     * @param string $uri
-     * @param callable|string|array $action
-     * @return Route
+     * @param string                    $method     Http method.
+     * @param string                    $uri        Route uri.
+     * @param callable|string|array     $action     Action handler.
+     * @return Route                                Brand-new route.
      */
     protected function newRoute(string $method, string $uri, callable|string|array $action): Route {
         return (new Route($method, $uri, $action))->setRouter($this)->setContainer($this->container);
@@ -172,8 +181,8 @@ class Router {
     /**
      * Add prefix to uri.
      *
-     * @param string $uri
-     * @return string
+     * @param string    $uri    Route uri.
+     * @return string           Prefixed uri.
      */
     protected function addPrefix(string $uri): string {
         $uri = trim(trim($this->getLastGroupStackPrefix(), '/').'/'.trim($uri, '/'), '/');
@@ -204,9 +213,9 @@ class Router {
      * Resolve Request with the Router.
      *
      * @param Request $request
-     * @return Response
+     * @return SymfonyResponse
      */
-    public function resolve(Request $request): Response {
+    public function resolve(Request $request): SymfonyResponse {
         if(!$this->container->isResolved('view')) {
             $this->initializeView();
         }
@@ -216,7 +225,6 @@ class Router {
 
     /**
      * Prepare view engine.
-     *
      * @return void
      */
     private function initializeView(): void {
@@ -225,67 +233,42 @@ class Router {
 
     /**
      * Dispatch the Route.
-     *
      * @param Request $request
-     * @return Response
+     * @return SymfonyResponse
      */
-    private function dispatchToRoute(Request $request): Response {
-        return $this->runRoute($request, $this->findRoute($request));
+    private function dispatchToRoute(Request $request): SymfonyResponse {
+        return $this->executeRoute($request, $this->findRoute($request));
     }
 
     /**
      * Run the matched Route.
-     *
-     * @param $request
-     * @param Route|null $route
-     * @return Response
+     * @param Request $request
+     * @param Route $route
+     * @return SymfonyResponse
      */
-    private function runRoute($request, Route|null $route): Response {
-        if(is_null($route)) {
-            return $this->prepareResponse($route);
-        }
-
+    private function executeRoute(Request $request, Route $route): SymfonyResponse {
+        //dispatch route event if there set any.
         $this->dispatcher->dispatch(new RouteMatchedEvent($request, $route));
 
-        $this->gatherMiddlewares();
+        //gather middleware for this route
+        $this->gatherMiddlewares($route);
 
-        return $this->prepareResponse($route);
+        return $this->container['dp']->get('Pipeline')
+                ->send($request)
+                ->through($this->getMiddlewarePriority())
+                ->next(fn()=>$this->prepareResponse($request, $route->compile()));
     }
 
     /**
-     * Prepare the correct Response.
-     *
-     * @param $route
-     * @return Response
+     * Arrange middleware based on priority.
+     * @return array
      */
-    protected function prepareResponse($route): Response {
-        $content = $this->getViewContent();
-
-        return match($route) {
-            null => response("<h1>404|NOT FOUND</h1>", 404,  ["Content-Type" => "text/html"]),
-            $this->isFallback($route) =>  response("<h1>404|NOT FOUND</h1>", 404,  ["Content-Type" => "text/html"]),
-            default => response($content, 200,  ["Content-Type" => "text/html"])
-        };
+    protected function getMiddlewarePriority(): array {
+        return array_reverse(Ary::merge($this->middlewares, $this->groupMiddlewares));
     }
 
     /**
-     * Get view content from cache.
-     *
-     * @return string
-     */
-    protected function getViewContent(): string {
-        $view = $this->container['cache']->get('view');
-
-        $content = $view->get();
-
-        //clean view
-        $view->clean();
-
-        return $content;
-    }
-
-    /**
-     * Set matched event.
+     * Adding an event listener when route is matched.
      * @param Closure|string $listener
      * @return void
      */
@@ -297,11 +280,24 @@ class Router {
      * Find the Route from RouteCollection.
      *
      * @param Request $request
-     * @return Route|null
+     * @return Route
      */
-    private function findRoute(Request $request): ?Route {
+    private function findRoute(Request $request): Route {
+        $this->dispatcher->dispatch(new RoutingEvent($request));
+        $this->currentRoute = $route = $this->routes->match($request);
+        $route->setContainer($this->container);
+        $this->container->setInstance(Route::class, $route);
 
-        return $this->routes->match($request);
+        return $route;
+    }
+
+    /**
+     * Adding an event listener when routing is started.
+     * @param Closure|string $listener
+     * @return void
+     */
+    public function matching(Closure|string $listener): void {
+        $this->listener->addEventListener(RoutingEvent::class, $listener);
     }
 
     /**
@@ -334,7 +330,6 @@ class Router {
 
         $this->groupStackProps[] = $props;
     }
-
 
     /**
      * Merge current group props with the last group props of the stack.
@@ -387,15 +382,29 @@ class Router {
      * @return bool
      */
     public function hasGroupStackProps(): bool {
-
         return !empty($this->groupStackProps);
     }
 
-    protected function gatherMiddlewares(): void {
-        $middleware = $this->container->make('middleware');
+    protected function gatherMiddlewares($route): void {
+        $middlewareContainer = $this->container->make('middleware');
 
-        $this->middlewares = $middleware->get('route');
-        $this->groupMiddlewares = $middleware->get('group');
+        foreach($route->middleware as $item) {
+            if(key_exists($item, $groupMw = $middlewareContainer->get('group'))) {
+                $this->groupMiddlewares = Ary::merge($this->groupMiddlewares, $groupMw[$item]);
+            }
+
+            if(key_exists($item, $routeMw = $middlewareContainer->get('route'))) {
+                $this->middlewares[] = $routeMw[$item];
+            }
+        }
+    }
+
+    /**
+     * Refresh route collection.
+     * @return void
+     */
+    public function refreshCollection(): void {
+        $this->routes->refreshNameList();
     }
 
     public function __call(string $name, array $arguments) {

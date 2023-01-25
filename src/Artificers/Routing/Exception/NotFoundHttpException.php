@@ -4,6 +4,6 @@ namespace Artificers\Routing\Exception;
 
 use Exception;
 
-class RouteNotFoundException extends Exception {
+class NotFoundHttpException extends Exception {
 
 }

@@ -3,6 +3,7 @@
 namespace Artificers\Routing;
 
 use Artificers\Http\Request;
+use Artificers\Routing\Exception\NotFoundHttpException;
 use Closure;
 
 class RouteCollection {
@@ -73,9 +74,10 @@ class RouteCollection {
 
     /**
      * @param Request $request
-     * @return Route|null
+     * @return Route
+     * @throws NotFoundHttpException
      */
-    public function match(Request $request): ?Route {
+    public function match(Request $request): Route {
         //1. We have to resolve request uri and method.
         $requestUri = $request->getRequestPath();
         $requestMethod = $request->getMethod();
@@ -91,29 +93,31 @@ class RouteCollection {
         return $this->handleMatchedRoute($request, $route);
     }
 
-
-    private function handleMatchedRoute(Request $request, Route|null $route): ?Route {
+    /**
+     * @param Request $request
+     * @param Route|null $route
+     * @return Route
+     * @throws NotFoundHttpException
+     */
+    private function handleMatchedRoute(Request $request, Route|null $route): Route {
         if(!is_null($route)) {
-
+            $route->bindRequest($request);
             return $route;
         }
-
-        //then we have to find the fallback route.
-        $fallbackRoute = $this->allRoutes['[fallback]'] ?? null;
-
-        if(!$fallbackRoute) {
-            return null;
-        }
-
-        return $fallbackRoute->setUri($fallbackRoute->where['fallback']);
+        throw new NotFoundHttpException;
     }
 
-    private function getMatchedRoute(string $method, string $targetUri): Route|null {
+    /**
+     * Find out the matched route.
+     * @param string $method
+     * @param string $targetUri
+     * @return Route|null
+     */
+    private function getMatchedRoute(string $method, string $targetUri): ?Route {
         $routes = $this->getRoutes($method);
 
         foreach($routes as $uri=>$route) {
             $uri = $this->prefixSlash($uri);
-
             if($uri !== '/') {
                 $pattern = $this->transformRouteUriIntoRegexPattern($uri);
 
@@ -122,10 +126,9 @@ class RouteCollection {
                     for($i = 1; $i < count($matches); ++$i) {
                         $key = $route->getProperties()['args'][$idx];
                         $route->setArgs($key, $matches[$i][0]);
-
-                        $route->unsetArgs($idx++);
+                        $route->unsetArgs($idx);
+                        $idx = $idx + 1;
                     }
-
                     return $route;
                 }
             }
