@@ -2,6 +2,8 @@
 
 namespace Artificers\Utility;
 
+use voku\helper\ASCII;
+
 class Str {
     /**
      * Check for a sub-string inside a string.
@@ -23,5 +25,9 @@ class Str {
         }
 
         return false;
+    }
+
+    public static function toAscii(string $haystack, string $language='en'): string {
+        return ASCII::to_ascii($haystack, $language);
     }
 }
