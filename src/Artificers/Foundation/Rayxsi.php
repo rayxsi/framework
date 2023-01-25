@@ -3,21 +3,24 @@ declare(strict_types=1);
 namespace Artificers\Foundation;
 
 use Artificers\Container\Container;
+use Artificers\Design\Patterns\Illusion;
+use Artificers\Design\Patterns\Pipeline;
 use Artificers\Events\EventServiceRegister;
 use Artificers\Foundation\Bootstrap\Environment;
 use Artificers\Foundation\Bootstrap\LoadConfigFiles;
 use Artificers\Foundation\Bootstrap\ServiceRegisters;
-use Artificers\Foundation\Config\Config;
 use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\EnvServiceRegister;
 use Artificers\Foundation\Events\BootEvent;
+use Artificers\Foundation\Exception\ApplicationFailedException;
 use Artificers\Http\Request;
 use Artificers\Routing\RouteServiceRegister;
-use Artificers\Support\Illusion\Illusion;
 use Artificers\Support\ServiceRegister;
 use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\NotFoundException;
 use Artificers\Utility\Ary;
+use Closure;
+use Exception;
 
 
 class Rayxsi extends Container {
@@ -31,15 +34,26 @@ class Rayxsi extends Container {
 
     protected bool $boot = false;
 
+    public static string $minimumPhpVersion = "8.0.0";
+
+    public static string $version = "1.0.0";
+
     protected array $serviceRegister = [];
 
     protected array $registeredServices = [];
+
+    protected array $_rayxsiMiddleware = [
+        Middleware\VersionChecker::class
+    ];
 
     public function __construct($basePath) {
         defined('DS') or define('DS', '/');
         defined('LOG_DIR') or define('LOG_DIR', $basePath.DS.'tmp'.DS.'logs');
 
         $this->basePath = $basePath;
+
+        $this->registerNecessaryPath();
+        $this->registerContainerAliases();
     }
 
     /**
@@ -47,26 +61,48 @@ class Rayxsi extends Container {
      *
      * @throws NotFoundException
      * @throws BindingException
+     * @throws Exception
      */
-    public function run(string $httpKernel) {
-        if(version_compare($phpVersion = PHP_VERSION, $mechanixMinVersion = Config::MECHANIX_MIN_REQUIRED_VERSION, '<')) {
-            die(sprintf('You are currently running PHP version[%s], but the Mechanix framework requires at least PHP version [%s]', $phpVersion, $mechanixMinVersion));
+    public function run(string $httpKernel): void {
+        //Process the application middleware and core properties that will need for booting.
+        $this->boot = (new Pipeline($this))->send($this)
+                ->through($this->applicationMiddlewareBasedOnPriority())
+                ->next(fn()=>$this->process(function($rayxsi) {
+                $rayxsi->registerFoundationBindings();
+                $rayxsi->baseServiceRegister();
+                $rayxsi->registerBootListeners();
+                $this['event.dispatcher']->dispatch(new BootEvent($this));
+            }));
+
+        //Now if there was no error of booting then application is working fine. Now it's ready to send back responses.
+        $this->booted(function($rayxsi)use($httpKernel) {
+            $rXsiAppKernel = $rayxsi->make($httpKernel);
+            $response = $rXsiAppKernel->resolve($request = Request::snap())->send();
+        });
+    }
+
+    /**
+     * @param Closure $callback
+     * @return bool
+     * @throws ApplicationFailedException
+     */
+    protected function process(Closure $callback): bool {
+        try {
+            $callback($this);
+        }catch(Exception $e) {
+            throw new ApplicationFailedException("<b>............Fail to boot rayxsi.......{$e->getMessage()}</b>", $e->getCode());
         }
 
-        //If all fine then boot
-        $this->boot = true;
+        return true;
+    }
 
-        $this->registerNecessaryPath();
-        $this->registerContainerAliases();
-        $this->registerFoundationBindings();
-        $this->baseServiceRegister();
-        $this->registerBootListeners();
-
-        $this['event.dispatcher']->dispatch(new BootEvent($this));
-
-        $rXsiAppKernel = $this->make($httpKernel);
-
-        $response = $rXsiAppKernel->resolve($request = Request::snap())->send();
+    /**
+     * Add application middleware.
+     * @param Closure|string $middleware
+     * @return void
+     */
+    public function middleware(Closure|string $middleware): void {
+        array_unshift($this->_rayxsiMiddleware, $middleware);
     }
 
     /**
@@ -124,12 +160,20 @@ class Rayxsi extends Container {
     }
 
     /**
-     * Return rayxsiApp public dir path.
+     * Return Rayxsi app public dir path.
      *
      * @return string
      */
     public function getPublicPath(): string {
         return $this->basePath.DS.'public';
+    }
+
+    /**
+     * Return Rayxsi app storage path.
+     * @return string
+     */
+    public function getStoragePath(): string {
+        return $this->getBase().DS.'storage';
     }
 
     /**
@@ -164,12 +208,18 @@ class Rayxsi extends Container {
         $this->setInstance('path.database', $this->getDatabasePath());
         $this->setInstance('path.view', $this->getViewPath());
         $this->setInstance('path.public', $this->getPublicPath());
+        $this->setInstance('path.storage', $this->getStoragePath());
+    }
+
+    protected function applicationMiddlewareBasedOnPriority(): array {
+        return array_reverse($this->_rayxsiMiddleware);
     }
 
     /**
      *Set character set.
      *
      * @return void
+     * @throws ApplicationFailedException
      */
     public function environment(): void {
         ini_set('default_charset', 'UTF-8');
@@ -194,7 +244,7 @@ class Rayxsi extends Container {
      */
     protected function registerBootListeners(): void {
 
-        $this['event.listener']->addEventListener('boot', [
+        $this['event.listener']->addEventListener('booting', [
             Environment::class.'@load',
             LoadConfigFiles::class.'@load',
             ServiceRegisters::class.'@load'
@@ -224,7 +274,8 @@ class Rayxsi extends Container {
      */
     private function registerContainerAliases(): void {
         $mechanix = [
-            'rXsiApp' => [\Artificers\Foundation\Rayxsi::class, \Artificers\Container\Container::class, \Artificers\Treaties\Container\ContainerTreaties::class, \Artificers\Foundation\Config\Config::class],
+            'rXsiApp' => [\Artificers\Foundation\Rayxsi::class, \Artificers\Container\Container::class,
+                \Artificers\Treaties\Container\ContainerTreaties::class],
             'env' => [\Artificers\Foundation\Environment\Env::class],
             'error.handle' => [\Artificers\Foundation\Config\ErrorHandling::class],
             'config' => [\Artificers\Config\Repository::class],
@@ -237,6 +288,7 @@ class Rayxsi extends Container {
             'db' => [\Artificers\Database\DatabaseManager::class],
             'db.schema'=>[\Artificers\Database\Lizie\Schema\Schema::class],
             'db.builder'=>[\Artificers\Database\Lizie\Query\Builder::class],
+            'dp'=>[\Artificers\Design\DesignPatternFactory::class],
             'router' => [\Artificers\Routing\Router::class],
             'request' => [\Artificers\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
@@ -285,21 +337,17 @@ class Rayxsi extends Container {
      */
     public function register(object|string $identifier, bool $force=false): ?ServiceRegister {
         //1. we have to check if service register already applied. If it is then just return it.
-
         if(($registered = $this->getServiceRegister($identifier)) && !$force) {
             return $registered;
         }
 
         //2. if service register passed by string then we have to resolve it.
-
         if(is_string($identifier)) {
             $identifier = $this->resolveServiceRegister($identifier);
         }
 
         //3. call the boot method also
-        if($this->isBooted()) {
-            $identifier->boot();
-        }
+        $identifier->boot();
 
         //4. now call the register method of service registers to register with rayxsi.
         $identifier->register();
@@ -338,12 +386,13 @@ class Rayxsi extends Container {
     }
 
     public function booted($callback) {
-        if($this->boot) {
+        if($this->isBooted()) {
             $callback($this);
         }
     }
 
     /**
+     * check if application is booted.
      * @return bool
      */
     public function isBooted(): bool {
