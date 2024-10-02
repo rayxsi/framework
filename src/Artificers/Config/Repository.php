@@ -6,7 +6,7 @@ use Artificers\Utility\Ary;
 class Repository {
 
     /**
-     * Store all the config items.
+     * Store all the configuration items.
      *
      * @var array
      */

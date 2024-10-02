@@ -2,7 +2,7 @@
 
 namespace Artificers\Events\Listener;
 
-use Artificers\Events\ListenerNotFoundException;
+use Artificers\Events\Exception\ListenerNotFoundException;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Utility\Ary;
 

@@ -24,7 +24,10 @@
         "psr/container": "^2.0",
         "psr/event-dispatcher": "^1.0",
         "symfony/http-foundation": "^6.1",
-        "symfony/finder": "^6.1"
+        "symfony/finder": "^6.1",
+        "monolog/monolog": "^3.2",
+        "voku/portable-ascii": "^2.0",
+        "symfony/error-handler": "^7.0"
     },
     "replace": {
         "artificers/routing": "self.version",

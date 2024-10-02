@@ -10,20 +10,20 @@ use Symfony\Component\Finder\Finder;
 class LoadConfigFiles implements BootstrapListenerTreaties {
 
     /**
-     * Load all config file.
+     * Load all configuration file.
      *
      * @param object $event
      * @return void
      */
     public function load($event): void {
-        //Create config repository instance
-        $event->getRayxsi()->setInstance('config', $repo = new Repository());
+        //Create configuration repository instance
+        $event->getRayxsi()->setInstance('configuration', $repo = new Repository());
 
         $this->loadConfigFiles($event->getRayxsi(), $repo);
     }
 
     /**
-     * Load config files.
+     * Load configuration files.
      *
      * @param Rayxsi $rXsiApp
      * @param Repository $repository
@@ -38,14 +38,14 @@ class LoadConfigFiles implements BootstrapListenerTreaties {
     }
 
     /**
-     * Resolve all config file.
+     * Resolve all configuration file.
      *
      * @param Rayxsi $rXsiApp
      * @return array
      */
     protected function getConfigFiles(Rayxsi $rXsiApp): array {
         $files = [];
-        foreach(Finder::create()->files()->name('*.php')->in($rXsiApp['path.config']) as $file) {
+        foreach(Finder::create()->files()->name('*.php')->in($rXsiApp['path.configuration']) as $file) {
             $files[$file->getFilenameWithoutExtension()] = $file->getRealPath();
         }
 

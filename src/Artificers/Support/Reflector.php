@@ -3,6 +3,8 @@
 namespace Artificers\Support;
 
 use Artificers\Container\Container;
+use ReflectionClass;
+use ReflectionException;
 use ReflectionNamedType;
 use ReflectionParameter;
 
@@ -29,5 +31,24 @@ class Reflector {
         }
 
         return $name;
+    }
+
+    public static function getClassName(mixed $obj): string|null {
+        $reflection = null;
+
+        try {
+            $reflection = static::getReflectionClass($obj);
+        } catch (ReflectionException $e) {
+           //----
+        }
+
+        return $reflection->getName();
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private static function getReflectionClass(mixed $obj): ReflectionClass|null {
+        return new ReflectionClass($obj);
     }
 }

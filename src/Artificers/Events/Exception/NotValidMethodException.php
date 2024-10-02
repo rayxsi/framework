@@ -1,6 +1,6 @@
 <?php
 
-namespace Artificers\Events;
+namespace Artificers\Events\Exception;
 
 use Exception;
 

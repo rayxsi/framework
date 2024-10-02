@@ -4,11 +4,12 @@ namespace Artificers\Foundation\Http;
 
 use Artificers\Foundation\Rayxsi;
 use Artificers\Http\Request;
-use Artificers\Http\Response;
 use Artificers\Routing\Router;
 use Artificers\Support\Illusion\Route;
+use Artificers\Treaties\Exception\ExceptionHandler;
 use Artificers\Treaties\Http\HttpKernelTreaties;
 use Closure;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Kernel implements HttpKernelTreaties {
@@ -22,6 +23,7 @@ class Kernel implements HttpKernelTreaties {
 
     public function resolve(Request $request): Response {
         try {
+            $this->router->refreshCollection();
             $response = $this->pushRequestThroughRouter($request);
         }catch(Throwable $e) {
             $response = $this->renderException($request, $e);
@@ -50,10 +52,10 @@ class Kernel implements HttpKernelTreaties {
     }
 
     protected function resolveWithGlobalMiddleware(): array {
-        return $this->rXsiApp['middleware']->get('global');
+        return array_reverse($this->rXsiApp['middleware']->get('global'));
     }
 
-    protected function resolveWithGroupMiddleware(): array {
-        return $this->rXsiApp['middleware']->get('group');
+    protected function renderException(Request $request, Throwable $e): Response {
+        return $this->rXsiApp->make(ExceptionHandler::class)->render($request, $e);
     }
 }

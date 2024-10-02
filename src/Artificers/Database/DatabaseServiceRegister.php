@@ -27,7 +27,7 @@ class DatabaseServiceRegister extends ServiceRegister {
 
     private function registerDB(): void {
         $this->rXsiApp->singleton('db', function($rXsiApp) {
-            $repo = $rXsiApp['config'];
+            $repo = $rXsiApp['configuration'];
             $driver = $repo->get('database.default');
 
             $connectionParams = $repo->get("database.connections.{$driver}");

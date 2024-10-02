@@ -6,7 +6,9 @@ use Artificers\Http\Request;
 use Throwable;
 
 interface ExceptionHandler {
-    public function throw(Request $request, Throwable $exp);
+    public function throw(Request $request, Throwable $e);
 
-    public function report(Throwable $exp);
+    public function report(Throwable $e);
+
+    public function render(Request $request, Throwable $e);
 }

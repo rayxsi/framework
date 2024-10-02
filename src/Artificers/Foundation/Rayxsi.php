@@ -7,9 +7,9 @@ use Artificers\Design\Patterns\Illusion;
 use Artificers\Design\Patterns\Pipeline;
 use Artificers\Events\EventServiceRegister;
 use Artificers\Foundation\Bootstrap\Environment;
+use Artificers\Foundation\Bootstrap\ExceptionHandle;
 use Artificers\Foundation\Bootstrap\LoadConfigFiles;
 use Artificers\Foundation\Bootstrap\ServiceRegisters;
-use Artificers\Foundation\Config\ErrorHandling;
 use Artificers\Foundation\Environment\EnvServiceRegister;
 use Artificers\Foundation\Events\BootEvent;
 use Artificers\Foundation\Exception\ApplicationFailedException;
@@ -115,12 +115,12 @@ class Rayxsi extends Container {
     }
 
     /**
-     * Return rayxsiApp config dir path.
+     * Return rayxsiApp configuration dir path.
      *
      * @return string
      */
     public function getConfigPath(): string {
-        return $this->basePath.DS.'config';
+        return $this->basePath.DS.'configuration';
     }
 
     /**
@@ -201,7 +201,7 @@ class Rayxsi extends Container {
     private function registerNecessaryPath(): void {
         $this->setInstance('path.app', $this->getAppPath());
         $this->setInstance('path.base', $this->getBase());
-        $this->setInstance('path.config', $this->getConfigPath());
+        $this->setInstance('path.configuration', $this->getConfigPath());
         $this->setInstance('path.tmp', $this->getTmpPath());
         $this->setInstance('path.ssr', $this->getSsrPath());
         $this->setInstance('path.node', 'node');
@@ -222,19 +222,7 @@ class Rayxsi extends Container {
      * @throws ApplicationFailedException
      */
     public function environment(): void {
-        ini_set('default_charset', 'UTF-8');
         $this['env']->load();
-    }
-
-    /**
-     * Generate all error into exceptions.
-     *
-     * @return void
-     */
-    public function errorHandler(): void {
-        error_reporting(E_ALL | E_STRICT);
-        set_error_handler([ErrorHandling::class, 'errorHandling']);
-        set_exception_handler([ErrorHandling::class, 'exceptionHandling']);
     }
 
     /**
@@ -246,18 +234,18 @@ class Rayxsi extends Container {
 
         $this['event.listener']->addEventListener('booting', [
             Environment::class.'@load',
+            ExceptionHandle::class.'@load',
             LoadConfigFiles::class.'@load',
             ServiceRegisters::class.'@load'
         ]);
     }
 
     /**
-     * @throws NotFoundException
      * @throws BindingException
      */
     public function registerConfiguredServices(): void {
         //resolve all registers from repository
-       $registers = $this['config']->get('rXsiApp.registers');
+       $registers = $this['configuration']->get('rXsiApp.registers');
 
        //make instance of all service register
        foreach($registers as $idx => $register) {
@@ -273,12 +261,11 @@ class Rayxsi extends Container {
      * @return void
      */
     private function registerContainerAliases(): void {
-        $mechanix = [
+        $aliasBox = [
             'rXsiApp' => [\Artificers\Foundation\Rayxsi::class, \Artificers\Container\Container::class,
                 \Artificers\Treaties\Container\ContainerTreaties::class],
             'env' => [\Artificers\Foundation\Environment\Env::class],
-            'error.handle' => [\Artificers\Foundation\Config\ErrorHandling::class],
-            'config' => [\Artificers\Config\Repository::class],
+            'configuration' => [\Artificers\Config\Repository::class],
             'event' => [\Artificers\Events\Event::class, \Artificers\Treaties\Events\EventTreaties::class],
             'event.dispatcher' => [\Artificers\Events\Dispatcher\EventDispatcher::class, \Artificers\Treaties\Events\EventDispatcherTreaties::class],
             'event.listener' => [\Artificers\Events\Listener\EventListenerProvider::class, \Artificers\Treaties\Events\EventListenerProviderTreaties::class],
@@ -294,7 +281,7 @@ class Rayxsi extends Container {
             'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
         ];
 
-        foreach($mechanix as $key=>$aliases) {
+        foreach($aliasBox as $key=>$aliases) {
             foreach($aliases as $alias) {
                 $this->setAlias($key, $alias);
             }
@@ -380,12 +367,12 @@ class Rayxsi extends Container {
         return $this[$register];
     }
 
-    protected function markAsRegistered(object $name) {
+    protected function markAsRegistered(object $name): void {
         $this->serviceRegister[] = $name;
         $this->registeredServices[get_class($name)] = true;
     }
 
-    public function booted($callback) {
+    public function booted($callback): void {
         if($this->isBooted()) {
             $callback($this);
         }

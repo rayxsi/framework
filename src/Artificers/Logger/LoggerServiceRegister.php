@@ -12,8 +12,8 @@ class LoggerServiceRegister extends ServiceRegister {
     public function register(): void {
         $this->rXsiApp->singleton('logger', function(Rayxsi $rayxsi) {
             $manager = new LogManager($rayxsi);
-            $driver = $rayxsi['config']->get('logger.default');
-            $config = $rayxsi['config']->get("logger.channels.{$driver}");
+            $driver = $rayxsi['configuration']->get('logger.default');
+            $config = $rayxsi['configuration']->get("logger.channels.{$driver}");
             return $manager->make($config);
         });
     }

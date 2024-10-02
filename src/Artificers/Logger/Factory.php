@@ -47,7 +47,7 @@ class Factory {
     }
 
     protected function sisHandler(array $config): SyslogHandler {
-        return new SyslogHandler($this->rayxsi['config']->get('rXsiApp.name'), $config['facility'] ?? LOG_USER, $config['level']);
+        return new SyslogHandler($this->rayxsi['configuration']->get('rXsiApp.name'), $config['facility'] ?? LOG_USER, $config['level']);
     }
 
     protected function errorHandler(array $config): ErrorLogHandler {
@@ -59,7 +59,7 @@ class Factory {
         $handlers = [];
 
         foreach($channels as $channel) {
-            $config = $this->rayxsi['config']->get("logger.channels.{$channel}");
+            $config = $this->rayxsi['configuration']->get("logger.channels.{$channel}");
             $handlers[] = $this->make($config);
         }
 
@@ -95,7 +95,7 @@ class Factory {
             $config['handler_with'] ?? []
         );
 
-        return new MonoLogger($config['driver'], $this->prepareHandlers($this->rayxsi->make($config['handler'], $with)));
+        return new MonoLogger($config['driver'], $this->prepareHandlers($this->rayxsi->make($config['handler']::class, $with)));
     }
 
     protected function prepareHandlers($handler): array {

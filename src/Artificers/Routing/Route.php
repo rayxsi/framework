@@ -248,10 +248,11 @@ class Route {
         unset($this->properties['args'][$key]);
     }
 
+    //if anything occur unexpected then all the exception from here are to be not found exception.404.
     public function compile():mixed {
         try {
             return $this->container->call($this->properties['action'], $this->properties['args']);
-        } catch (BindingException|NotFoundException|\ReflectionException $e) {
+        } catch (BindingException|\ReflectionException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
     }

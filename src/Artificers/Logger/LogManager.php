@@ -36,10 +36,10 @@ class LogManager {
 
     public function channel(string $channel): Logger|bool {
         if($channel === 'deprecations') {
-            $config = $this->rayxsi['config']->get("logger.{$channel}");
-            $config = $this->rayxsi['config']->get("logger.channels.{$config['channel']}");
+            $config = $this->rayxsi['configuration']->get("logger.{$channel}");
+            $config = $this->rayxsi['configuration']->get("logger.channels.{$config['channel']}");
         }else {
-            $config = $this->rayxsi['config']->get("logger.channel.{$channel}");
+            $config = $this->rayxsi['configuration']->get("logger.channel.{$channel}");
         }
 
         return $this->make($config);

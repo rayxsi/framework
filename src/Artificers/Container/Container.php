@@ -9,8 +9,7 @@ use Artificers\Treaties\Container\BindingException;
 use Artificers\Treaties\Container\ContainerTreaties;
 use Artificers\Treaties\Container\NotFoundException;
 use Closure;
-use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
-use JetBrains\PhpStorm\Internal\TentativeType;
+
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
@@ -59,12 +58,11 @@ class Container implements ArrayAccess, ContainerTreaties {
      *{@inheritdoc}
      * @param string $id
      * @throws BindingException
-     * @throws NotFoundException
      */
     public function get(string $id) {
         try {
             return $this->resolve($id);
-        } catch (BindingException|NotFoundException $e) {
+        } catch (BindingException $e) {
             if($this->has($id)) throw $e;
 
             throw new NotFoundException("Not found {$id}", $e->getCode());
@@ -179,7 +177,6 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @param array $params
      * @return mixed
      * @throws BindingException
-     * @throws NotFoundException
      */
     public function make(string $identifier, array $params = []): mixed {
         return $this->resolve($identifier, $params);
@@ -192,7 +189,6 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @param array $params
      * @return mixed
      * @throws BindingException
-     * @throws NotFoundException
      */
     public function resolve(string|callable $identifier, array $params = []): mixed {
         $object = null;
@@ -243,7 +239,7 @@ class Container implements ArrayAccess, ContainerTreaties {
         return isset($this->aliases[$identifier]) ? $this->getAlias($this->aliases[$identifier]) : $identifier;
     }
 
-    public function setAlias(string $which, string $key) {
+    public function setAlias(string $which, string $key): void {
         $this->aliases[$key] = $which;
     }
 
@@ -274,7 +270,6 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @param string|callable $concrete
      * @return object
      * @throws BindingException
-     * @throws NotFoundException
      */
     public function build(string|callable $concrete): object {
         //1.Check $concrete is a valid closure or not. If it is then simply call this concrete and return this result.
@@ -319,7 +314,6 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @param array $dependencies
      * @return array
      * @throws BindingException
-     * @throws NotFoundException
      */
     public function resolveDependencies(array $dependencies): array {
         $instancesArr = [];
@@ -357,7 +351,6 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @param ReflectionParameter $param
      * @return array|mixed
      * @throws BindingException
-     * @throws NotFoundException
      */
     private function resolveClass(ReflectionParameter $param): mixed {
         //1.Check  if it is variadic(class) type hint
@@ -378,7 +371,6 @@ class Container implements ArrayAccess, ContainerTreaties {
      * @param ReflectionParameter $param
      * @return array|mixed
      * @throws BindingException
-     * @throws NotFoundException
      */
     private function resolveVariadicClass(ReflectionParameter $param): mixed {
         //Resolve parameter type and alias
@@ -393,7 +385,7 @@ class Container implements ArrayAccess, ContainerTreaties {
 
         if(is_null($concrete)) {
             //throw a VariadicBindingException
-            throw new NotFoundException("Unresolved variadic parameter [{$param}] in class {$belongToClass}. You need to explicitly do variadic binding for this.");
+            throw new BindingException("Unresolved variadic parameter [{$param}] in class {$belongToClass}. You need to explicitly do variadic binding for this.");
         }
 
         //Check if Closure then just call it and return its instances.
@@ -470,7 +462,7 @@ class Container implements ArrayAccess, ContainerTreaties {
         return static::$instance;
     }
 
-    public function clean() {
+    public function flush(): void {
         $this->instances = [];
         $this->resolved = [];
         $this->aliases = [];
@@ -491,7 +483,6 @@ class Container implements ArrayAccess, ContainerTreaties {
 
     /**
      * @inheritDoc
-     * @throws NotFoundException
      * @throws BindingException
      */
     public function offsetGet(mixed $offset): mixed {

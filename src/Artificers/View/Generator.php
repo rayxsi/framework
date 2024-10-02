@@ -2,12 +2,10 @@
 
 namespace Artificers\View;
 
-use Artificers\Cache\ViewCache;
 use Artificers\Container\Container;
 use Artificers\Support\JSON;
 use Artificers\Treaties\View\CompilerTreaties;
 use Artificers\Treaties\View\EngineTreaties;
-use Symfony\Component\Finder\Finder;
 
 class Generator {
     protected Container $container;

@@ -5,6 +5,7 @@ use Artificers\Container\Container;
 use Artificers\Http\Request;
 use Artificers\Routing\Events\RouteMatchedEvent;
 use Artificers\Routing\Events\RoutingEvent;
+use Artificers\Routing\Exception\NotFoundHttpException;
 use Artificers\Support\Concern\AboutResponse;
 use Artificers\Treaties\Events\EventDispatcherTreaties;
 use Artificers\Treaties\Events\EventListenerProviderTreaties;
@@ -214,6 +215,7 @@ class Router {
      *
      * @param Request $request
      * @return SymfonyResponse
+     * @throws NotFoundHttpException
      */
     public function resolve(Request $request): SymfonyResponse {
         if(!$this->container->isResolved('view')) {
@@ -235,6 +237,7 @@ class Router {
      * Dispatch the Route.
      * @param Request $request
      * @return SymfonyResponse
+     * @throws NotFoundHttpException
      */
     private function dispatchToRoute(Request $request): SymfonyResponse {
         return $this->executeRoute($request, $this->findRoute($request));
@@ -281,6 +284,7 @@ class Router {
      *
      * @param Request $request
      * @return Route
+     * @throws NotFoundHttpException
      */
     private function findRoute(Request $request): Route {
         $this->dispatcher->dispatch(new RoutingEvent($request));

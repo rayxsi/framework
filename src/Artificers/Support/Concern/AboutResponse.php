@@ -3,6 +3,7 @@ namespace Artificers\Support\Concern;
 
 use Artificers\Http\Request;
 use Artificers\Support\Illusion\Response;
+use Artificers\Treaties\Http\Exception\HttpExceptionTreaties;
 use Artificers\Treaties\Support\Jsonable;
 use Artificers\Treaties\Support\Stringable;
 use JsonSerializable;
@@ -29,7 +30,9 @@ trait AboutResponse {
             && !$response instanceof SymfonyResponse) {
 
             $response = Response::with(["Content-Type"=>"application/json"])->json($response, 200);
-        }elseif(!$response instanceof SymfonyResponse) {
+        }elseif(!$response instanceof SymfonyResponse && $response instanceof HttpExceptionTreaties) {
+            $response = Response::with(["Content-Type"=>"text/html", ...$response->getHeaders()])->back($response->getMessage(), $response->getStatusCode());
+        }else if(!$response instanceof SymfonyResponse) {
             $response = Response::with(["Content-Type"=>"text/html"])->back($response, 200);
         }
 
