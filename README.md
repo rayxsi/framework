@@ -1,4 +1,7 @@
-# framework
-The rayxsi framework.
+# A Web App Framework
+**Rayxsi** gives you flexibility and provide powerful mechanism to build website faster. This package is the core of **Rayxsi** framework
 
-On going project.
+To install **Rayxsi** just type in shell:
+
+`composer require rayxsi/framework`
+
