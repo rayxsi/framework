@@ -1,11 +1,14 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Artificers\Design\Patterns;
 
 use Artificers\Foundation\Rayxsi;
 use RuntimeException;
 
-abstract class Illusion {
+abstract class Illusion
+{
     protected static Rayxsi $rXsiApp;
 
     protected static array $cachedInstances = [];
@@ -18,7 +21,8 @@ abstract class Illusion {
      * @return string
      * @throws RuntimeException
      */
-    protected static function getIllusionAccessor(): string {
+    protected static function getIllusionAccessor(): string
+    {
         //This should change when custom we will make custom error generator
         throw new RuntimeException('Illusion does not implement getIllusionAccessor method.');
     }
@@ -28,7 +32,8 @@ abstract class Illusion {
      *
      * @return mixed|void
      */
-    protected static function getIllusionRoot() {
+    protected static function getIllusionRoot()
+    {
         return static::resolvedIllusionInstance(static::getIllusionAccessor());
     }
 
@@ -38,14 +43,15 @@ abstract class Illusion {
      * @param string $name
      * @return mixed|void
      */
-    protected static function resolvedIllusionInstance(string $name) {
-        if(isset(static::$cachedInstances[$name])) {
+    protected static function resolvedIllusionInstance(string $name)
+    {
+        if (isset(static::$cachedInstances[$name])) {
             return static::$cachedInstances[$name];
         }
 
-        if(static::$rXsiApp) {
-            if(static::$cache) {
-               return static::$cachedInstances[$name] = static::$rXsiApp[$name];
+        if (static::$rXsiApp) {
+            if (static::$cache) {
+                return static::$cachedInstances[$name] = static::$rXsiApp[$name];
             }
 
             return static::$rXsiApp[$name];
@@ -58,7 +64,8 @@ abstract class Illusion {
      * @param Rayxsi $app
      * @return void
      */
-    public static function setIllusionApplication(Rayxsi $app): void {
+    public static function setIllusionApplication(Rayxsi $app): void
+    {
         static::$rXsiApp = $app;
     }
 
@@ -68,7 +75,8 @@ abstract class Illusion {
      * @param string $name
      * @return void
      */
-    public static function removeCachedInstance(string $name): void {
+    public static function removeCachedInstance(string $name): void
+    {
         unset(static::$cachedInstances[$name]);
     }
 
@@ -77,14 +85,16 @@ abstract class Illusion {
      *
      * @return void
      */
-    public static function removeAllCachedInstances(): void {
+    public static function removeAllCachedInstances(): void
+    {
         static::$cachedInstances = [];
     }
 
-    public static function __callStatic(string $method, array $args) {
+    public static function __callStatic(string $method, array $args)
+    {
         $object = static::getIllusionRoot();
 
-        if(!$object)
+        if (!$object)
             throw new RuntimeException('A illusion root has not been set.');
 
         return $object->$method(...$args);

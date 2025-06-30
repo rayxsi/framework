@@ -22,12 +22,14 @@ class MethodHandler {
      * @throws ReflectionException
      */
     public static function call(Container $container, Closure|array|string $callback, array $params = [], $defaultMethod = null) {
+        
         //1. we have to resolve default method if callback is string. because it may be only class name or class name with @ sign with method.
         if(is_string($callback) && !$defaultMethod && method_exists($callback, '__invoke')) {
             $defaultMethod = '__invoke';
         }
 
         if(static::callableWithAtSign($callback) || $defaultMethod) {
+            
             return static::classCall($container, $callback, $params, $defaultMethod);
         }
 
@@ -39,7 +41,8 @@ class MethodHandler {
      * @throws BindingException
      */
     protected static function boundCall(Container $container, Closure|array|string $callback, $params) {
-        return $callback(...array_values(static::resolveMethodDependencies($container, $callback, $params)));
+        $result = $callback(...array_values(static::resolveMethodDependencies($container, $callback, $params)));
+        return $result;
     }
 
     /**
@@ -50,7 +53,7 @@ class MethodHandler {
      */
     protected static function resolveMethodDependencies($container, $callback, $params): array {
         $dependencies = [];
-
+        
         foreach(static::getReflector($callback)->getParameters() as $param) {
             static::addDependencies($container, $param, $params, $dependencies);
         }
@@ -135,7 +138,7 @@ class MethodHandler {
      */
     public static function classCall(Container $container, Closure|array|string $callback, array $params = [], $defaultMethod = null) {
        [$action, $method] = static::getClassAndMethodName($callback, $defaultMethod);
-
+       
         return static::call($container, Ary::make($container->make($action), $method), $params);
     }
 

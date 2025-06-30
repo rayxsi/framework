@@ -19,7 +19,7 @@ use Throwable;
  * @author Topu <toerso.mechanix@gmail.com>
  */
 class ExceptionHandle implements BootstrapListenerTreaties {
-    private static Rayxsi $rXsiApp;
+    private static ?Rayxsi $rXsiApp = null;
 
     public function load($event): void {
         static::$rXsiApp = $event->getRayxsi();
@@ -55,7 +55,6 @@ class ExceptionHandle implements BootstrapListenerTreaties {
 
 
     public function __handleException(Throwable $e): void {
-
         try {
             $this->generateExceptionHandler()->report($e);
         }catch (BindingException $e) {
@@ -126,6 +125,8 @@ class ExceptionHandle implements BootstrapListenerTreaties {
     }
 
     protected function parseTo(string $method): Closure {
-        return fn(...$args)=>static::$rXsiApp ? $this->{$method}(...$args) : false;
+        //dump(static::$rXsiApp);
+
+        return fn(...$args) => static::$rXsiApp ? $this->{$method}(...$args) : false;
     }
 }

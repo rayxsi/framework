@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Artificers\Routing;
 
 use Artificers\Container\Container;
@@ -19,7 +22,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  *
  * @author Topu <toerso.mechanix@gmail.com>
  */
-class Router {
+class Router
+{
     use AboutResponse;
     /**
      * Container.
@@ -61,7 +65,8 @@ class Router {
 
     protected Route $currentRoute;
 
-    public function __construct(Container $container = null) {
+    public function __construct(?Container $container = null)
+    {
         $this->container = $container ?: new Container;
         $this->routes = new RouteCollection;
 
@@ -75,7 +80,8 @@ class Router {
      * @param callable|string|array     $action     Action handler for this route.
      * @return Route    Route instance.
      */
-    public function get(string $uri, callable|string|array $action): Route {
+    public function get(string $uri, callable|string|array $action): Route
+    {
         return $this->addRoute('GET', $uri, $action);
     }
 
@@ -85,7 +91,8 @@ class Router {
      * @param callable|string|array     $action     Action handler for this route.
      * @return Route    Route instance.
      */
-    public function post(string $uri, callable|string|array $action): Route {
+    public function post(string $uri, callable|string|array $action): Route
+    {
         return $this->addRoute('POST', $uri, $action);
     }
 
@@ -96,8 +103,9 @@ class Router {
      * @param callable|string|array     $action     Action handler for this route.
      * @return Route    Route instance.
      */
-    public function put(string $uri, callable|string|array $action): Route {
-      return $this->addRoute('PUT', $uri, $action);
+    public function put(string $uri, callable|string|array $action): Route
+    {
+        return $this->addRoute('PUT', $uri, $action);
     }
 
     /**
@@ -107,8 +115,9 @@ class Router {
      * @param callable|string|array     $action     Action handler for this route.
      * @return Route    Route instance.
      */
-    public function delete(string $uri, callable|string|array $action): Route {
-       return $this->addRoute('DELETE', $uri, $action);
+    public function delete(string $uri, callable|string|array $action): Route
+    {
+        return $this->addRoute('DELETE', $uri, $action);
     }
 
     /**
@@ -117,7 +126,8 @@ class Router {
      * @param callable $action  Action handler for fallback route.
      * @return Route    Route instance.
      */
-    public function fallback(callable $action): Route {
+    public function fallback(callable $action): Route
+    {
         $placeholder = "fallback";
 
         return $this->addRoute('GET', "[{$placeholder}]", $action)->where($placeholder, '.*')->setName('fallback');
@@ -131,7 +141,8 @@ class Router {
      * @param callable|string|array $action    Action handler for this route
      * @return Route Route instance.
      */
-    protected function addRoute(string $method, string $uri, callable|string|array $action): Route {
+    protected function addRoute(string $method, string $uri, callable|string|array $action): Route
+    {
         return $this->routes->add($this->createRoute($method, $uri, $action));
     }
 
@@ -143,15 +154,16 @@ class Router {
      * @param callable|string|array $action    Action handler for this route
      * @return Route Route instance.
      */
-    protected function createRoute(string $method, string $uri, callable|string|array $action): Route {
-        if(Ary::isArr($action)) {
+    protected function createRoute(string $method, string $uri, callable|string|array $action): Route
+    {
+        if (Ary::isArr($action)) {
             $action = $this->concatActionWithHandler($action);
         }
 
         $route = $this->newRoute($method, $this->addPrefix($uri), $action);
 
-        if($this->hasGroupStackProps()) {
-          $this->mergeGroupStackPropsToRouteProps($route);
+        if ($this->hasGroupStackProps()) {
+            $this->mergeGroupStackPropsToRouteProps($route);
         }
 
         return $route;
@@ -163,8 +175,9 @@ class Router {
      * @param array $action     Array of action and handler that will concatenate with @ sign.
      * @return string           Concatenated string with @.
      */
-    protected function concatActionWithHandler(array $action): string {
-        return $action[0].'@'.$action[1];
+    protected function concatActionWithHandler(array $action): string
+    {
+        return $action[0] . '@' . $action[1];
     }
 
     /**
@@ -175,7 +188,8 @@ class Router {
      * @param callable|string|array     $action     Action handler.
      * @return Route                                Brand-new route.
      */
-    protected function newRoute(string $method, string $uri, callable|string|array $action): Route {
+    protected function newRoute(string $method, string $uri, callable|string|array $action): Route
+    {
         return (new Route($method, $uri, $action))->setRouter($this)->setContainer($this->container);
     }
 
@@ -185,8 +199,9 @@ class Router {
      * @param string    $uri    Route uri.
      * @return string           Prefixed uri.
      */
-    protected function addPrefix(string $uri): string {
-        $uri = trim(trim($this->getLastGroupStackPrefix(), '/').'/'.trim($uri, '/'), '/');
+    protected function addPrefix(string $uri): string
+    {
+        $uri = trim(trim($this->getLastGroupStackPrefix(), '/') . '/' . trim($uri, '/'), '/');
 
         return $uri !== '' ? $uri : '/';
     }
@@ -196,7 +211,8 @@ class Router {
      *
      * @return string
      */
-    protected function getLastGroupStackPrefix(): string {
+    protected function getLastGroupStackPrefix(): string
+    {
         return $this->hasGroupStackProps() ? end($this->groupStackProps)['prefix'] ?? '' : '';
     }
 
@@ -206,7 +222,8 @@ class Router {
      * @param Route $route
      * @return void
      */
-    protected function mergeGroupStackPropsToRouteProps(Route $route): void {
+    protected function mergeGroupStackPropsToRouteProps(Route $route): void
+    {
         $route->setProperties($this->mergeWithLastGroupProps($route->getProperties(), false));
     }
 
@@ -217,8 +234,9 @@ class Router {
      * @return SymfonyResponse
      * @throws NotFoundHttpException
      */
-    public function resolve(Request $request): SymfonyResponse {
-        if(!$this->container->isResolved('view')) {
+    public function resolve(Request $request): SymfonyResponse
+    {
+        if (!$this->container->isResolved('view')) {
             $this->initializeView();
         }
 
@@ -229,7 +247,8 @@ class Router {
      * Prepare view engine.
      * @return void
      */
-    private function initializeView(): void {
+    private function initializeView(): void
+    {
         $this->container['view'];
     }
 
@@ -239,7 +258,8 @@ class Router {
      * @return SymfonyResponse
      * @throws NotFoundHttpException
      */
-    private function dispatchToRoute(Request $request): SymfonyResponse {
+    private function dispatchToRoute(Request $request): SymfonyResponse
+    {
         return $this->executeRoute($request, $this->findRoute($request));
     }
 
@@ -249,7 +269,8 @@ class Router {
      * @param Route $route
      * @return SymfonyResponse
      */
-    private function executeRoute(Request $request, Route $route): SymfonyResponse {
+    private function executeRoute(Request $request, Route $route): SymfonyResponse
+    {
         //dispatch route event if there set any.
         $this->dispatcher->dispatch(new RouteMatchedEvent($request, $route));
 
@@ -257,16 +278,17 @@ class Router {
         $this->gatherMiddlewares($route);
 
         return $this->container['dp']->get('Pipeline')
-                ->send($request)
-                ->through($this->getMiddlewarePriority())
-                ->next(fn()=>$this->prepareResponse($request, $route->compile()));
+            ->send($request)
+            ->through($this->getMiddlewarePriority())
+            ->next(fn() => $this->prepareResponse($request, $route->compile()));
     }
 
     /**
      * Arrange middleware based on priority.
      * @return array
      */
-    protected function getMiddlewarePriority(): array {
+    protected function getMiddlewarePriority(): array
+    {
         return array_reverse(Ary::merge($this->middlewares, $this->groupMiddlewares));
     }
 
@@ -275,7 +297,8 @@ class Router {
      * @param Closure|string $listener
      * @return void
      */
-    protected function matched(Closure|string $listener): void {
+    protected function matched(Closure|string $listener): void
+    {
         $this->listener->addEventListener(RouteMatchedEvent::class, $listener);
     }
 
@@ -286,7 +309,8 @@ class Router {
      * @return Route
      * @throws NotFoundHttpException
      */
-    private function findRoute(Request $request): Route {
+    private function findRoute(Request $request): Route
+    {
         $this->dispatcher->dispatch(new RoutingEvent($request));
         $this->currentRoute = $route = $this->routes->match($request);
         $route->setContainer($this->container);
@@ -300,7 +324,8 @@ class Router {
      * @param Closure|string $listener
      * @return void
      */
-    public function matching(Closure|string $listener): void {
+    public function matching(Closure|string $listener): void
+    {
         $this->listener->addEventListener(RoutingEvent::class, $listener);
     }
 
@@ -311,8 +336,9 @@ class Router {
      * @param Closure|array|string $routes
      * @return void
      */
-    public function group(array $properties, Closure|array|string $routes): void {
-        foreach(Ary::wrap($routes) as $groupRoutes) {
+    public function group(array $properties, Closure|array|string $routes): void
+    {
+        foreach (Ary::wrap($routes) as $groupRoutes) {
             $this->updateGroupPropsStack($properties);
 
             $this->makeRoutes($groupRoutes);
@@ -326,9 +352,10 @@ class Router {
      * @param array $props
      * @return void
      */
-    protected function updateGroupPropsStack(array $props): void {
+    protected function updateGroupPropsStack(array $props): void
+    {
         //If group props stack already having props then we assume current group as subgroup and merge with the last stack elements.
-        if($this->hasGroupStackProps()) {
+        if ($this->hasGroupStackProps()) {
             $props = $this->mergeWithLastGroupProps($props);
         }
 
@@ -342,8 +369,9 @@ class Router {
      * @param bool $prependWithExistingPrefix
      * @return array
      */
-    protected function mergeWithLastGroupProps(array $props, bool $prependWithExistingPrefix = true): array {
-       return RouteGroup::mergeProps($props, end($this->groupStackProps), $prependWithExistingPrefix);
+    protected function mergeWithLastGroupProps(array $props, bool $prependWithExistingPrefix = true): array
+    {
+        return RouteGroup::mergeProps($props, end($this->groupStackProps), $prependWithExistingPrefix);
     }
 
     /**
@@ -352,8 +380,9 @@ class Router {
      * @param $routes
      * @return void
      */
-    private function makeRoutes($routes): void {
-        if(is_string($routes)) {
+    private function makeRoutes($routes): void
+    {
+        if (is_string($routes)) {
             (new RouteFileRegistrar($this))->register($routes);
             return;
         }
@@ -367,7 +396,8 @@ class Router {
      * @param Route $route
      * @return bool
      */
-    private function isFallback(Route $route): bool {
+    private function isFallback(Route $route): bool
+    {
         return $route->getUri() === '.*';
     }
 
@@ -376,7 +406,8 @@ class Router {
      *
      * @return RouteCollection
      */
-    public function getRoutes(): RouteCollection {
+    public function getRoutes(): RouteCollection
+    {
         return $this->routes;
     }
 
@@ -385,19 +416,21 @@ class Router {
      *
      * @return bool
      */
-    public function hasGroupStackProps(): bool {
+    public function hasGroupStackProps(): bool
+    {
         return !empty($this->groupStackProps);
     }
 
-    protected function gatherMiddlewares($route): void {
+    protected function gatherMiddlewares($route): void
+    {
         $middlewareContainer = $this->container->make('middleware');
 
-        foreach($route->middleware as $item) {
-            if(key_exists($item, $groupMw = $middlewareContainer->get('group'))) {
+        foreach ($route->middleware as $item) {
+            if (key_exists($item, $groupMw = $middlewareContainer->get('group'))) {
                 $this->groupMiddlewares = Ary::merge($this->groupMiddlewares, $groupMw[$item]);
             }
 
-            if(key_exists($item, $routeMw = $middlewareContainer->get('route'))) {
+            if (key_exists($item, $routeMw = $middlewareContainer->get('route'))) {
                 $this->middlewares[] = $routeMw[$item];
             }
         }
@@ -407,13 +440,15 @@ class Router {
      * Refresh route collection.
      * @return void
      */
-    public function refreshCollection(): void {
+    public function refreshCollection(): void
+    {
         $this->routes->refreshNameList();
     }
 
-    public function __call(string $name, array $arguments) {
-       if($name === 'makeGroup') {
-           return (new RouteRegistrar($this, $this->routes))->prepareForGrouping($name, $arguments[0]??[]);
-       }
+    public function __call(string $name, array $arguments)
+    {
+        if ($name === 'makeGroup') {
+            return (new RouteRegistrar($this, $this->routes))->prepareForGrouping($name, $arguments[0] ?? []);
+        }
     }
 }

@@ -10,9 +10,10 @@ use Artificers\Treaties\Events\EventListenerProviderTreaties;
 use Artificers\Treaties\Events\EventTreaties;
 use Artificers\Utility\Ary;
 use Closure;
+use Exception;
 use InvalidArgumentException;
 use ReflectionException;
-
+use Throwable;
 
 class EventDispatcher implements EventDispatcherTreaties {
     private EventListenerProviderTreaties $listener;
@@ -41,7 +42,6 @@ class EventDispatcher implements EventDispatcherTreaties {
         $params = array_merge($this->listener->getAllParams(), ['event'=>$event]);
 
         foreach($this->listener->getListenersForEvent($event) as $listener) {
-
             //we can pass single listener. Like this UserServiceListener::class. Rayxsi call by default handle method of listener. We can also use user defined method
             //like this = 'UserServiceListener@User_defined_method'
             //we can pass multiple listeners. Like this using array = [UserServiceListener::class, UserServiceListener2::class]. Default call to handle method of listeners.
@@ -53,7 +53,6 @@ class EventDispatcher implements EventDispatcherTreaties {
 
             if(Ary::isArr($listener)) {
                 foreach($listener as $actionListener) {
-
                     if(is_string($actionListener)) {
                         $this->call($actionListener, $params, 'handle');
                     }else {

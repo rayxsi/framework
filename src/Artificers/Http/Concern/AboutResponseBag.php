@@ -85,7 +85,7 @@ trait AboutResponseBag {
      * @param string                $disposition    The type of Content-Disposition to set automatically with the filename
      * @return BinaryFileResponse                   BinaryFileResponse response instance.
      */
-    public function download(SplFileInfo|string $file, string $filename = null, array $headers = [], string $disposition = 'attachment'): BinaryFileResponse {
+    public function download(SplFileInfo|string $file, ?string $filename = null, array $headers = [], string $disposition = 'attachment'): BinaryFileResponse {
         $response = new BinaryFileResponse($file, $filename, Ary::merge($headers, $this->headers), $disposition);
 
         //checking if file name is null

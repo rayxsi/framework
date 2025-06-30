@@ -17,7 +17,7 @@ trait AboutInputs {
      * @param string|null   $default    Default value of this key.
      * @return mixed                    All if key is not set. Otherwise, returns the value of that key. If key doesn't exist then return the default value.
      */
-    public function retrieveItemFrom(string $source, string $key, string $default = null): mixed {
+    public function retrieveItemFrom(string $source, string $key, ?string $default = null): mixed {
         if(empty($key)) {
             return $this->$source->all();
         }
@@ -31,7 +31,7 @@ trait AboutInputs {
      * @param string|null   $default    Default value of this key.
      * @return mixed                    All if key is not set. Otherwise, returns the value of that key. If key doesn't exist then return the default value.
      */
-    public function header(string $key, string $default = null): mixed {
+    public function header(string $key, ?string $default = null): mixed {
         return $this->retrieveItemFrom("headers", $key, $default);
     }
 
@@ -41,7 +41,7 @@ trait AboutInputs {
      * @param string|null   $default    Default value of this key.
      * @return mixed                    All if key is not set. Otherwise, returns the value of that key. If key doesn't exist then return the default value.
      */
-    public function server(string $key, string $default = null): mixed {
+    public function server(string $key, ?string $default = null): mixed {
         return $this->retrieveItemFrom('server', $key, $default);
     }
 }

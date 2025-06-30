@@ -175,7 +175,7 @@ class Route {
         return $this->properties['args'];
     }
 
-    public function where(string|array $placeholder, string $exp = null): self {
+    public function where(string|array $placeholder, ?string $exp = null): self {
         foreach($this->parseWhereClause($placeholder, $exp) as $name=>$expression) {
             $this->properties['where'][$name] = $expression;
         }

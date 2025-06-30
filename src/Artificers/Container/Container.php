@@ -208,6 +208,7 @@ class Container implements ArrayAccess, ContainerTreaties {
         //3.Now we have to build manually...........
         //3a.First check is buildable or not
         if($this->isBuildable($identifier, $concrete)) {
+            // if ($concrete == "request") var_dump($identifier);
             $object = $this->build($concrete);
         }
 

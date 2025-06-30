@@ -12,7 +12,7 @@ class Generator {
     protected EngineTreaties $engine;
     public CompilerTreaties $compiler;
 
-    public function __construct(EngineTreaties $engine, CompilerTreaties $compiler, Container $container = null) {
+    public function __construct(EngineTreaties $engine, CompilerTreaties $compiler, ?Container $container = null) {
         $this->container = $container ?: new Container();
         $this->engine = $engine;
         $this->compiler = $compiler;

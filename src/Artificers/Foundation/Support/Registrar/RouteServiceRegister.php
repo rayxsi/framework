@@ -18,7 +18,6 @@ class RouteServiceRegister extends ServiceRegister {
      */
     public function register(): void {
        $this->loadRoutes();
-
         $this->rXsiApp->booted(function($rXsiApp) {
             $rXsiApp['router']->getRoutes()->refreshNameList();
         });

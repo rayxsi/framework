@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Artificers\Foundation;
 
 use Artificers\Container\Container;
@@ -23,7 +25,8 @@ use Closure;
 use Exception;
 
 
-class Rayxsi extends Container {
+class Rayxsi extends Container
+{
 
     /**
      * Base path of rayxsiApp.
@@ -46,9 +49,10 @@ class Rayxsi extends Container {
         Middleware\VersionChecker::class
     ];
 
-    public function __construct($basePath) {
+    public function __construct($basePath)
+    {
         defined('DS') or define('DS', '/');
-        defined('LOG_DIR') or define('LOG_DIR', $basePath.DS.'tmp'.DS.'logs');
+        defined('LOG_DIR') or define('LOG_DIR', $basePath . DS . 'tmp' . DS . 'logs');
 
         $this->basePath = $basePath;
 
@@ -63,19 +67,21 @@ class Rayxsi extends Container {
      * @throws BindingException
      * @throws Exception
      */
-    public function run(string $httpKernel): void {
+    public function run(string $httpKernel): void
+    {
         //Process the application middleware and core properties that will need for booting.
         $this->boot = (new Pipeline($this))->send($this)
-                ->through($this->applicationMiddlewareBasedOnPriority())
-                ->next(fn()=>$this->process(function($rayxsi) {
+            ->through($this->applicationMiddlewareBasedOnPriority())
+            ->next(fn() => $this->process(function ($rayxsi) {
                 $rayxsi->registerFoundationBindings();
                 $rayxsi->baseServiceRegister();
                 $rayxsi->registerBootListeners();
                 $this['event.dispatcher']->dispatch(new BootEvent($this));
             }));
+            
 
         //Now if there was no error of booting then application is working fine. Now it's ready to send back responses.
-        $this->booted(function($rayxsi)use($httpKernel) {
+        $this->booted(function ($rayxsi) use ($httpKernel) {
             $rXsiAppKernel = $rayxsi->make($httpKernel);
             $response = $rXsiAppKernel->resolve($request = Request::snap())->send();
         });
@@ -86,10 +92,11 @@ class Rayxsi extends Container {
      * @return bool
      * @throws ApplicationFailedException
      */
-    protected function process(Closure $callback): bool {
+    protected function process(Closure $callback): bool
+    {
         try {
             $callback($this);
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             throw new ApplicationFailedException("<b>............Fail to boot rayxsi.......{$e->getMessage()}</b>", $e->getCode());
         }
 
@@ -101,7 +108,8 @@ class Rayxsi extends Container {
      * @param Closure|string $middleware
      * @return void
      */
-    public function middleware(Closure|string $middleware): void {
+    public function middleware(Closure|string $middleware): void
+    {
         array_unshift($this->_rayxsiMiddleware, $middleware);
     }
 
@@ -110,8 +118,9 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getAppPath(): string {
-        return $this->basePath.DS.'app';
+    public function getAppPath(): string
+    {
+        return $this->basePath . DS . 'app';
     }
 
     /**
@@ -119,8 +128,9 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getConfigPath(): string {
-        return $this->basePath.DS.'configuration';
+    public function getConfigPath(): string
+    {
+        return $this->basePath . DS . 'configuration';
     }
 
     /**
@@ -128,8 +138,9 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getDatabasePath(): string {
-        return $this->basePath.DS.'database';
+    public function getDatabasePath(): string
+    {
+        return $this->basePath . DS . 'database';
     }
 
     /**
@@ -137,8 +148,9 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getSsrPath(): string {
-        return $this->basePath.DS.'runtime'.DS.'ssr';
+    public function getSsrPath(): string
+    {
+        return $this->basePath . DS . 'runtime' . DS . 'ssr';
     }
 
     /**
@@ -146,8 +158,9 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getTmpPath(): string {
-        return $this->basePath.DS.'tmp';
+    public function getTmpPath(): string
+    {
+        return $this->basePath . DS . 'tmp';
     }
 
     /**
@@ -155,8 +168,9 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getViewPath(): string {
-        return $this->basePath.DS.'view';
+    public function getViewPath(): string
+    {
+        return $this->basePath . DS . 'view';
     }
 
     /**
@@ -164,16 +178,18 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getPublicPath(): string {
-        return $this->basePath.DS.'public';
+    public function getPublicPath(): string
+    {
+        return $this->basePath . DS . 'public';
     }
 
     /**
      * Return Rayxsi app storage path.
      * @return string
      */
-    public function getStoragePath(): string {
-        return $this->getBase().DS.'storage';
+    public function getStoragePath(): string
+    {
+        return $this->getBase() . DS . 'storage';
     }
 
     /**
@@ -181,7 +197,8 @@ class Rayxsi extends Container {
      *
      * @return string
      */
-    public function getBase(): string {
+    public function getBase(): string
+    {
         return $this->basePath;
     }
 
@@ -189,8 +206,9 @@ class Rayxsi extends Container {
      * @param string $path
      * @return string
      */
-    public function basePath(string $path): string {
-        return $this->getBase().DIRECTORY_SEPARATOR.$path;
+    public function basePath(string $path): string
+    {
+        return $this->getBase() . DIRECTORY_SEPARATOR . $path;
     }
 
     /**
@@ -198,7 +216,8 @@ class Rayxsi extends Container {
      *
      * @return void
      */
-    private function registerNecessaryPath(): void {
+    private function registerNecessaryPath(): void
+    {
         $this->setInstance('path.app', $this->getAppPath());
         $this->setInstance('path.base', $this->getBase());
         $this->setInstance('path.configuration', $this->getConfigPath());
@@ -211,7 +230,8 @@ class Rayxsi extends Container {
         $this->setInstance('path.storage', $this->getStoragePath());
     }
 
-    protected function applicationMiddlewareBasedOnPriority(): array {
+    protected function applicationMiddlewareBasedOnPriority(): array
+    {
         return array_reverse($this->_rayxsiMiddleware);
     }
 
@@ -221,7 +241,8 @@ class Rayxsi extends Container {
      * @return void
      * @throws ApplicationFailedException
      */
-    public function environment(): void {
+    public function environment(): void
+    {
         $this['env']->load();
     }
 
@@ -230,29 +251,29 @@ class Rayxsi extends Container {
      *
      * @return void
      */
-    protected function registerBootListeners(): void {
+    protected function registerBootListeners(): void
+    {
 
         $this['event.listener']->addEventListener('booting', [
-            Environment::class.'@load',
-            ExceptionHandle::class.'@load',
-            LoadConfigFiles::class.'@load',
-            ServiceRegisters::class.'@load'
+            Environment::class . '@load',
+            ExceptionHandle::class . '@load',
+            LoadConfigFiles::class . '@load',
+            ServiceRegisters::class . '@load'
         ]);
     }
 
     /**
      * @throws BindingException
      */
-    public function registerConfiguredServices(): void {
+    public function registerConfiguredServices(): void
+    {
         //resolve all registers from repository
-       $registers = $this['configuration']->get('rXsiApp.registers');
-
-       //make instance of all service register
-       foreach($registers as $idx => $register) {
-           $this->register($register);
-
-           unset($registers[$idx]);
-       }
+        $registers = $this['configuration']->get('rXsiApp.registers');
+        //make instance of all service register
+        foreach ($registers as $idx => $register) {
+            $this->register($register);
+            unset($registers[$idx]);
+        }
     }
 
     /**
@@ -260,10 +281,14 @@ class Rayxsi extends Container {
      *
      * @return void
      */
-    private function registerContainerAliases(): void {
+    private function registerContainerAliases(): void
+    {
         $aliasBox = [
-            'rXsiApp' => [\Artificers\Foundation\Rayxsi::class, \Artificers\Container\Container::class,
-                \Artificers\Treaties\Container\ContainerTreaties::class],
+            'rXsiApp' => [
+                \Artificers\Foundation\Rayxsi::class,
+                \Artificers\Container\Container::class,
+                \Artificers\Treaties\Container\ContainerTreaties::class
+            ],
             'env' => [\Artificers\Foundation\Environment\Env::class],
             'configuration' => [\Artificers\Config\Repository::class],
             'event' => [\Artificers\Events\Event::class, \Artificers\Treaties\Events\EventTreaties::class],
@@ -273,16 +298,16 @@ class Rayxsi extends Container {
             'croxo.engine' => [\Artificers\View\Engines\Croxo::class, \Artificers\Treaties\View\EngineTreaties::class],
             'cache' => [\Artificers\Cache\CacheManager::class],
             'db' => [\Artificers\Database\DatabaseManager::class],
-            'db.schema'=>[\Artificers\Database\Lizie\Schema\Schema::class],
-            'db.builder'=>[\Artificers\Database\Lizie\Query\Builder::class],
-            'dp'=>[\Artificers\Design\DesignPatternFactory::class],
+            'db.schema' => [\Artificers\Database\Lizie\Schema\Schema::class],
+            'db.builder' => [\Artificers\Database\Lizie\Query\Builder::class],
+            'dp' => [\Artificers\Design\DesignPatternFactory::class],
             'router' => [\Artificers\Routing\Router::class],
             'request' => [\Artificers\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'response' => [\Artificers\Http\Response::class, \Symfony\Component\HttpFoundation\Response::class]
         ];
 
-        foreach($aliasBox as $key=>$aliases) {
-            foreach($aliases as $alias) {
+        foreach ($aliasBox as $key => $aliases) {
+            foreach ($aliases as $alias) {
                 $this->setAlias($key, $alias);
             }
         }
@@ -293,14 +318,16 @@ class Rayxsi extends Container {
      *
      * @return void
      */
-    private function registerFoundationBindings(): void {
+    private function registerFoundationBindings(): void
+    {
         static::setToInstance($this);
         $this->setInstance('rXsiApp', $this);
         $this->setInstance(Container::class, $this);
         Illusion::setIllusionApplication($this);
     }
 
-    protected static function setToInstance(Container|Rayxsi $rXsiApp = null): void {
+    protected static function setToInstance(Container|Rayxsi|null $rXsiApp = null): void
+    {
         static::$instance = $rXsiApp;
     }
 
@@ -309,7 +336,8 @@ class Rayxsi extends Container {
      *
      * @return void
      */
-    private function baseServiceRegister(): void {
+    private function baseServiceRegister(): void
+    {
         $this->register(new EnvServiceRegister($this));
         $this->register(new EventServiceRegister($this));
         $this->register(new RouteServiceRegister($this));
@@ -322,14 +350,15 @@ class Rayxsi extends Container {
      * @param bool $force
      * @return ?ServiceRegister
      */
-    public function register(object|string $identifier, bool $force=false): ?ServiceRegister {
+    public function register(object|string $identifier, bool $force = false): ?ServiceRegister
+    {
         //1. we have to check if service register already applied. If it is then just return it.
-        if(($registered = $this->getServiceRegister($identifier)) && !$force) {
+        if (($registered = $this->getServiceRegister($identifier)) && !$force) {
             return $registered;
         }
 
         //2. if service register passed by string then we have to resolve it.
-        if(is_string($identifier)) {
+        if (is_string($identifier)) {
             $identifier = $this->resolveServiceRegister($identifier);
         }
 
@@ -349,10 +378,11 @@ class Rayxsi extends Container {
      * @param object|string $register
      * @return mixed
      */
-    protected function getServiceRegister(object|string $register): mixed {
+    protected function getServiceRegister(object|string $register): mixed
+    {
         $id = is_string($register) ? $register : get_class($register);
 
-        $registers = Ary::filter($this->serviceRegister, function($value) use($id){
+        $registers = Ary::filter($this->serviceRegister, function ($value) use ($id) {
             return $value instanceof $id;
         }, 'both');
 
@@ -363,17 +393,20 @@ class Rayxsi extends Container {
      * @param string $register
      * @return ServiceRegister
      */
-    protected function resolveServiceRegister(string $register): ServiceRegister {
+    protected function resolveServiceRegister(string $register): ServiceRegister
+    {
         return $this[$register];
     }
 
-    protected function markAsRegistered(object $name): void {
+    protected function markAsRegistered(object $name): void
+    {
         $this->serviceRegister[] = $name;
         $this->registeredServices[get_class($name)] = true;
     }
 
-    public function booted($callback): void {
-        if($this->isBooted()) {
+    public function booted($callback): void
+    {
+        if ($this->isBooted()) {
             $callback($this);
         }
     }
@@ -382,7 +415,8 @@ class Rayxsi extends Container {
      * check if application is booted.
      * @return bool
      */
-    public function isBooted(): bool {
+    public function isBooted(): bool
+    {
         return $this->boot;
     }
 }

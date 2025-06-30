@@ -19,7 +19,7 @@
     },
     "require": {
         "php": "^8.0",
-        "symfony/process": "6.1.x-dev",
+        "symfony/process": "^6.1.x-dev",
         "vlucas/phpdotenv": "^5.4",
         "psr/container": "^2.0",
         "psr/event-dispatcher": "^1.0",
