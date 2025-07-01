@@ -1,8 +1,10 @@
 {
     "name": "rayxsi/framework",
+    "type": "library",
     "description": "The rayxsi framework",
     "keywords": ["rayxsi", "framework"],
     "license": "MIT",
+    "homepage": "https://github.com/rayxsi/framework",
     "authors": [
         {
             "name": "toerso",
